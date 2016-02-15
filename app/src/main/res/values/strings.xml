@@ -1,0 +1,96 @@
+<!--
+  ~ Copyright 2015 Yunus Emre Şeker. All rights reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="swipe_dismiss_view_behavior" translatable="false">com.y3seker.egeyemekhanemobil.ui.CardViewSwipeDismiss</string>
+    <string name="app_name">Ege Yemekhane Mobil</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="user_name">Kullanıcı Adı</string>
+    <string name="password">Parola</string>
+    <string name="login">Giriş</string>
+    <string name="cancel">Iptal</string>
+    <string name="caf1">1 Nolu Yemekhane</string>
+    <string name="caf2">2 Nolu Yemekhane</string>
+    <string name="try_again">Tekrar Dene</string>
+
+    <string name="breakfast_wp">Kahvaltı (2.25 TL)</string>
+    <string name="lunch_wp">Öğle (2.75 TL)</string>
+    <string name="dinner_wp">Akşam (2.75 TL)</string>
+    <string name="breakfast">Kahvaltı</string>
+    <string name="lunch">Öğle</string>
+    <string name="dinner">Akşam</string>
+    <string name="congrats">Tebrikler!</string>
+    <string name="exit">Çıkış</string>
+    <string name="hello">Merhaba!</string>
+    <string name="pls_login">Lütfen Giriş Yapın</string>
+    <string name="user_info">Kullanıcı Bilgileri</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="delete">Sil</string>
+    <string name="close">Kapat</string>
+    <string name="logging_in">Giriş Yapılıyor…</string>
+    <string name="order_menu">Yemek Sipariş</string>
+    <string name="cancel_order">Yemek Iptal</string>
+    <string name="caf_history">Yemekhane Hareketleri</string>
+    <string name="my_menus">Yemeklerim</string>
+    <string name="balance_history">Bakiye Hareketleri</string>
+    <string name="logging_out">Çıkış Yapılıyor</string>
+    <string name="no_cancel_items">İptal Edilebilecek Öğün Yok</string>
+    <string name="caf0">Personel Yemekhanesi</string>
+    <string name="user_deleted">"Kullanıcı Silindi: "</string>
+    <string name="add_account">Hesap Ekle</string>
+    <string name="no_result">Kriterlere Uygun Sonuç Yok!</string>
+    <string name="cant_be_empty">Bu Kısım Boş Olamaz</string>
+    <string name="wrong_info">Bilgiler Hatalı</string>
+    <string name="user_already_exist">Bu kullanıcı daha önce eklenmiş</string>
+    <string name="choose_caf">Yemekhane Seçin</string>
+    <string name="more">Daha Fazla</string>
+    <string name="loading">Yükleniyor</string>
+    <string name="error_tryagain">Hata Oluştu, Tekrar Dene?</string>
+    <string name="verify">Onayla</string>
+    <string name="connection_error">Bağlantı Hatası</string>
+    <string name="new_order">Yeni Sipariş</string>
+    <string name="about">Hakkında</string>
+    <string name="settings">Ayarlar</string>
+    <string name="licenses">Lisanslar</string>
+    <string name="error">Hata!</string>
+    <string name="order_failed">Sipariş işlemi sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.</string>
+
+    <string name="monday">Pazartesi</string>
+    <string name="tuesday">Salı</string>
+    <string name="wednesday">Çarşamba</string>
+    <string name="thursday">Perşembe</string>
+    <string name="friday">Cuma</string>
+
+    <string name="about_text">Gayriresmi Ege Üniversitesi Yemekhane Sistemleri mobil uygulaması. \n\n Yunus Emre Şeker © 2015</string>
+
+    <string name="welcome">Hoşgeldiniz</string>
+    <string name="mymenus_today">Bugünkü Yemeklerim</string>
+    <string name="next_week_reminder">Haftaya yemek almayı unutma!</string>
+    <string name="feedback">Geri Bildirim</string>
+    <string name="send_via">Mail Gönder</string>
+    <string name="feedback_title">Ege Yemekhane Mobil Geri Bildirim</string>
+    <string name="feedback_cant_send">Geri Bildirim Gönderilemiyor.</string>
+
+</resources><!--
+           <br>
+           <h2><a href=""></a></h2>
+           <p></p>
+
+           -->
