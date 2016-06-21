@@ -52,7 +52,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingStart="16dp"
-            android:text="Kahvaltı"
+            android:text="İftar"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/grey_400"
             android:textStyle="bold" />

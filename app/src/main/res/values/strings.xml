@@ -33,6 +33,7 @@
     <string name="breakfast_wp">Kahvaltı (2.25 TL)</string>
     <string name="lunch_wp">Öğle (2.75 TL)</string>
     <string name="dinner_wp">Akşam (2.75 TL)</string>
+    <string name="iftar_wp">İftar (2.75 TL)</string>
     <string name="breakfast">Kahvaltı</string>
     <string name="lunch">Öğle</string>
     <string name="dinner">Akşam</string>

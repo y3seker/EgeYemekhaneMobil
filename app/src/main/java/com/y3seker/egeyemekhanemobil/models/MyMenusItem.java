@@ -18,15 +18,8 @@ package com.y3seker.egeyemekhanemobil.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-
-import com.squareup.okhttp.internal.Util;
-import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.select.Elements;
-
-import java.text.ParseException;
-import java.util.Date;
 
 /**
  * Created by Yunus Emre Şeker on 19.10.2015.
@@ -42,7 +35,7 @@ public class MyMenusItem implements Parcelable {
         this.balance = elements.get(1).text();
         this.dateString = elements.get(2).text();
         String mType = elements.get(3).text();
-        updateMeals(mType);
+        setMeals(mType);
     }
 
     public MyMenusItem(String dateString, boolean dinner, boolean lunch, boolean breakfast) {
@@ -73,9 +66,9 @@ public class MyMenusItem implements Parcelable {
         }
     };
 
-    public void updateMeals(String s) {
+    public void setMeals(String s) {
         switch (s) {
-            case "Kahvaltı":
+            case "iftar":
                 breakfast = true;
                 break;
             case "Öğlen":

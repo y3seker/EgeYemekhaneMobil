@@ -16,6 +16,7 @@
 
 <resources>
     <string-array name="menu_types">
+        <item>@string/iftar_wp</item>
         <item>@string/lunch_wp</item>
         <item>@string/dinner_wp</item>
     </string-array>

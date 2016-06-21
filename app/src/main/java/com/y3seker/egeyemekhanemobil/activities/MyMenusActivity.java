@@ -207,7 +207,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
             String date = element.children().get(2).text();
             String rDate = Utils.getReverseDateString(date); //Utils.getReverseDateString(date);
             if (map.containsKey(rDate)) {
-                map.get(rDate).updateMeals(element.children().get(3).text());
+                map.get(rDate).setMeals(element.children().get(3).text());
             } else {
                 map.put(rDate, new MyMenusItem(element.children()));
             }

@@ -43,7 +43,7 @@ import java.util.Random;
  * Created by Yunus Emre Şeker on 24.10.2015.
  * -
  */
-public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.OrderHolder> implements View.OnClickListener {
+public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.OrderHolder> implements View.OnClickListener, View.OnLongClickListener {
 
     Context mContext;
     List<OrderItem> items;
@@ -89,6 +89,7 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
         final OrderHolder h = new OrderHolder(v);
         h.checker.setTag(h);
         h.checker.setOnClickListener(this);
+        h.checker.setOnLongClickListener(this);
         return h;
     }
 
@@ -160,12 +161,25 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
         if (pos < daysLength)
             return;
         OrderItem item = getItem(pos);
-        if (BuildConfig.DEBUG || !item.isDisabled) {
+
+        if (!item.isDisabled) {
             item.isInProgress = !item.isInProgress;
             item.isChecked = !item.isChecked;
             notifyItemChanged(pos);
             checkerListener.onChange(item, pos, item.isChecked);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        OrderHolder holder = (OrderHolder) v.getTag();
+        int pos = holder.getAdapterPosition();
+        if (pos < daysLength)
+            return false;
+        OrderItem item = getItem(pos);
+
+
+        return false;
     }
 
     public void progressDone(boolean succeed, int pos) {
@@ -178,6 +192,8 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
     public OrderItem getItem(int pos) {
         return items.get(pos - daysLength);
     }
+
+
 
     public class OrderHolder extends RecyclerView.ViewHolder {
 

@@ -182,6 +182,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     }
 
     private void parseAndUpdateUI(Document doc) throws NullPointerException {
+        Log.i(TAG,"Parsing order objects");
         if (orderItems.size() != 0) {
             orderItems.clear();
             rvAdapter.notifyDataSetChanged();
@@ -429,7 +430,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         hideFab();
-        getFirstPage(position + 2);
+        getFirstPage(position + 1);
     }
 
     private void unsubscribeAll() {
