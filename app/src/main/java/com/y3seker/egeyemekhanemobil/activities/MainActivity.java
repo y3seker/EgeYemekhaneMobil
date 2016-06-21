@@ -144,7 +144,8 @@ public class MainActivity extends RxAppCompatActivity
         cookiesPrefs = this.getSharedPreferences(PrefConstants.COOKIE_STORE_PREF, MODE_PRIVATE);
         appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         users = getIntent().getParcelableArrayListExtra("users");
-
+        if (users == null)
+            users = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
@@ -154,7 +155,19 @@ public class MainActivity extends RxAppCompatActivity
         setupUsers();
         setupCards();
         Utils.setupReminder(this, true);
-        getDeviceInfo();
+        /*
+        new MonthlyMenus().fetch(new MonthlyMenus.FetchListener() {
+            @Override
+            public void onFetchDone(List asd) {
+                Log.i(TAG, "onFetchDone: ");
+            }
+
+            @Override
+            public void onFetchFailed(Exception e) {
+                Log.e(TAG, "onFetchFailed: ", e);
+            }
+        });
+        */
     }
 
     private void setupUsers() {

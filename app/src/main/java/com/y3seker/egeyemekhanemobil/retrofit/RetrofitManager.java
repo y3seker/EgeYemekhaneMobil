@@ -17,7 +17,6 @@
 package com.y3seker.egeyemekhanemobil.retrofit;
 
 import com.squareup.okhttp.OkHttpClient;
-import com.y3seker.egeyemekhanemobil.ThisApplication;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 
 import java.net.CookieManager;
@@ -88,4 +87,7 @@ public class RetrofitManager {
         cookieManager.getCookieStore().removeAll();
     }
 
+    public static OkHttpClient getOkHttpClient() {
+        return okHttpClient;
+    }
 }

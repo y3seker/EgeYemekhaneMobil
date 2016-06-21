@@ -99,7 +99,7 @@ public class Database extends SQLiteOpenHelper {
         updatedValues.put(USER_USERNAME, user.getUsername());
         updatedValues.put(USER_PASSWORD, user.getPassword());
 
-        // Insert it into the database.
+        // Update it into the database.
         return getWritableDatabase().update(TABLE_USER, updatedValues, USER_UNIQUEID + "=" + user.getUniqeID(), null);
     }
 

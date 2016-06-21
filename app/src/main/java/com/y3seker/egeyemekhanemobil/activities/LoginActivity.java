@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.Database;
@@ -134,6 +135,7 @@ public class LoginActivity extends RxAppCompatActivity {
         mainIntent.putParcelableArrayListExtra(ParseConstants.USERS, (ArrayList<? extends Parcelable>) users);
         startActivity(mainIntent);
         finish();
+        db.close();
     }
 
     @Override
@@ -147,7 +149,8 @@ public class LoginActivity extends RxAppCompatActivity {
                 db.insertUser(user);
                 startActivity(LOGIN_SUCCEED_ACTION);
             } else if (resultCode == RESULT_CANCELED) {
-                finish();
+                Toast.makeText(this, "Uygulamayı kullanabilmek için üyelik eklemelisiniz.", Toast.LENGTH_SHORT).show();
+                //finish();
             }
         }
 
