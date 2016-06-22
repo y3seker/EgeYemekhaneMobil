@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Url;
 import rx.Observable;
 
 /**
@@ -31,6 +32,9 @@ import rx.Observable;
  * -
  */
 public interface ConnectionService {
+
+    @GET
+    Observable<Document> getRequest(@Url String url);
 
     @GET(UrlConstants.C_DEFAULT)
     Observable<Document> getLogin();
