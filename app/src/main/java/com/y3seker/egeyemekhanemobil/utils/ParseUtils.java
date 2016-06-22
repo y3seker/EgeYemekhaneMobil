@@ -20,6 +20,7 @@ import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.util.HashMap;
 
@@ -40,6 +41,8 @@ public final class ParseUtils {
     public static void extractViewState(HashMap<String, String> viewStates, Document document) throws NullPointerException {
         viewStates.put(ParseConstants.VIEW_STATE, document.getElementById(ParseConstants.VIEW_STATE).val());
         viewStates.put(ParseConstants.VIEW_STATE_GEN, document.getElementById(ParseConstants.VIEW_STATE_GEN).val());
+        Element eventVal = document.getElementById(ParseConstants.EVENT_VAL);
+        if (eventVal == null) return;
         viewStates.put(ParseConstants.EVENT_VAL, document.getElementById(ParseConstants.EVENT_VAL).val());
     }
 

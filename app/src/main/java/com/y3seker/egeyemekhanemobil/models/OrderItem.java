@@ -23,44 +23,28 @@ import com.y3seker.egeyemekhanemobil.utils.Utils;
  * -
  */
 public class OrderItem implements Comparable<OrderItem> {
-    public String text, name, dayNumber;
+    public String text, name, dayNumber, menuUrl, menu;
     public boolean isDisabled;
     public boolean isChecked;
     public boolean isInProgress;
     public boolean isOrderedBefore;
     public String date;
 
-    public OrderItem(String text, String name) {
-        this.text = text.replace("(menü)", "");
-        this.name = name;
-        this.isChecked = false;
-    }
-
-    public OrderItem(String text, String name, String date) {
-        this.date = date;
-        this.text = text.replace("(menü)", "");
-        this.name = name;
-        this.isChecked = false;
-    }
-
-    public OrderItem(String text, String name, String date, boolean isDisabled) {
-        this.date = date;
-        this.isDisabled = isDisabled;
-        this.text = text.replace("(menü)", "");
-        this.name = name;
-        this.isChecked = false;
-        this.isInProgress = false;
-    }
-
     public OrderItem(String text, String name, String date, boolean isDisabled, boolean isOrderedBefore) {
         this.text = text;
         this.name = name;
         this.date = date;
+        this.menu = "";
         this.dayNumber = text.replaceAll("\\D+", "");
         this.isDisabled = isDisabled;
-        this.isOrderedBefore = isOrderedBefore;
         this.isInProgress = false;
         this.isChecked = false;
+        this.isOrderedBefore = isOrderedBefore;
+    }
+
+    public OrderItem(String text, String name, String date, boolean isDisabled, boolean isOrderedBefore, String menuUrl) {
+        this(text, name, date, isDisabled, isOrderedBefore);
+        this.menuUrl = menuUrl;
     }
 
     public void reset() {
@@ -76,6 +60,14 @@ public class OrderItem implements Comparable<OrderItem> {
 
     public void setIsOrderedBefore(boolean isOrderedBefore) {
         this.isOrderedBefore = isOrderedBefore;
+    }
+
+    public void setMenu(String menu) {
+        this.menu = menu;
+    }
+
+    public boolean isMenuSet() {
+        return !menu.isEmpty();
     }
 
     @Override

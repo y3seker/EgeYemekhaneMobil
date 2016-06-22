@@ -88,6 +88,7 @@
     <string name="send_via">Mail Gönder</string>
     <string name="feedback_title">Ege Yemekhane Mobil Geri Bildirim</string>
     <string name="feedback_cant_send">Geri Bildirim Gönderilemiyor.</string>
+    <string name="no_menu_found">Yemek Bulunamadı.</string>
 
 </resources><!--
            <br>

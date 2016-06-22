@@ -48,8 +48,8 @@ public final class Utils {
 
     private static final String TAG = Utils.class.getSimpleName();
 
-    public static TimeZone trTimeZone;
-    public static Locale trLocale;
+    private static TimeZone trTimeZone;
+    private static Locale trLocale;
     public static SimpleDateFormat myMenusDateFormat, myMenusReverseDateFormat, orderDateFormat, balanceDateFormat;
     public static DecimalFormat twoDigit;
     public static Calendar today;

@@ -175,11 +175,10 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
         OrderHolder holder = (OrderHolder) v.getTag();
         int pos = holder.getAdapterPosition();
         if (pos < daysLength)
-            return false;
+            return true;
         OrderItem item = getItem(pos);
-
-
-        return false;
+        checkerListener.onLongClick(item, pos);
+        return true;
     }
 
     public void progressDone(boolean succeed, int pos) {
@@ -192,7 +191,6 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
     public OrderItem getItem(int pos) {
         return items.get(pos - daysLength);
     }
-
 
 
     public class OrderHolder extends RecyclerView.ViewHolder {

@@ -31,10 +31,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.RequestBody;
 import com.trello.rxlifecycle.ActivityEvent;
+import com.y3seker.egeyemekhanemobil.Connection;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.OrderItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -51,6 +53,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
@@ -128,6 +131,11 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
             public void onChange(OrderItem orderItem, int pos, boolean isChecked) {
                 postItem(orderItem.name, pos);
             }
+
+            @Override
+            public void onLongClick(OrderItem item, int pos) {
+                showItemsMenu(item);
+            }
         });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +145,53 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         });
         fabLP = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         dismissProgressDialog();
+    }
+
+    private void showItemsMenu(final OrderItem item) {
+
+        if (item.isMenuSet()) {
+            Toast.makeText(getBaseContext(), item.menu, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        RetrofitManager.api().getRequest(item.menuUrl)
+                .compose(this.bindUntilEvent(ActivityEvent.STOP))
+                .cast(Document.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Document>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(OrderActivity.this, R.string.error_tryagain, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(Document document) {
+                        String menu, title = document.select("[id=Label1]").text();
+                        Element table = document.select("[id=lblTable]").first();
+                        if (table.children().size() == 0)
+                            menu = getString(R.string.no_menu_found);
+                        else {
+                            Elements menuRows = table.select("tbody").first().children();
+                            menuRows.remove(0);
+                            menu = title + "\n\n";
+                            for (Element menuRow : menuRows) {
+                                menu += menuRow.text() + "\n";
+                            }
+                        }
+                        item.setMenu(menu);
+                        Toast.makeText(getBaseContext(), menu, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void parseAndShowMenu(Document doc) {
+
     }
 
     private void getFirstPage(final int menuType) {
@@ -182,7 +237,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     }
 
     private void parseAndUpdateUI(Document doc) throws NullPointerException {
-        Log.i(TAG,"Parsing order objects");
+        Log.i(TAG, "Parsing order objects");
         if (orderItems.size() != 0) {
             orderItems.clear();
             rvAdapter.notifyDataSetChanged();
@@ -198,8 +253,10 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                     boolean isOrderedBefore = item.select("font").attr("color").contentEquals("Maroon");
                     boolean isDisabled = item.select("span").hasAttr("disabled");
                     String dateString;
+                    String menuUrl;
                     try {
-                        dateString = item.select("a").attr("href").substring(22, 31 + 1).replace("&", "").replace("o","");
+                        menuUrl = item.select("a").attr("href");
+                        dateString = item.select("a").attr("href").substring(22, 31 + 1).replace("&", "").replace("o", "");
                     } catch (StringIndexOutOfBoundsException e) {
                         continue;
                     }
@@ -207,8 +264,9 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                         dateString = dateString.replaceFirst("\\.", ".0");
                     if (dateString.length() == 9)
                         dateString = "0" + dateString;
+                    Log.i(TAG, isDisabled + " MENU URL " + menuUrl);
                     orderItems.add(new OrderItem(item.text(), item.select("span").select("input").attr("name"),
-                            dateString, isDisabled, isOrderedBefore));
+                            dateString, isDisabled, isOrderedBefore, menuUrl));
                 }
             }
         }
@@ -474,5 +532,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     public interface CheckerListener {
         void onChange(OrderItem item, int pos, boolean isChecked);
+
+        void onLongClick(OrderItem item, int pos);
     }
 }
