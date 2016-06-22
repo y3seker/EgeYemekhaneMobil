@@ -33,7 +33,6 @@
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,95 +40,41 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.Main">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.Main" />
         <activity
             android:name=".activities.AddUserActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Dark.AddNewUser">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.Dark.AddNewUser" />
         <activity
             android:name=".activities.BalanceActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseTransparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.BaseTransparent" />
         <activity
             android:name=".activities.CancelActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseTransparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.BaseTransparent" />
         <activity
             android:name=".activities.OrderActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseTransparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.BaseTransparent" />
         <activity
             android:name=".activities.MyActsActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseTransparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.BaseTransparent" />
         <activity
             android:name=".activities.MyMenusActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.BaseTransparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.BaseTransparent" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Settings">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.Settings" />
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Dark">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:theme="@style/AppTheme.Dark" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <receiver android:name=".ReminderReceiver"/>
+        <receiver android:name=".ReminderReceiver" />
 
         <receiver
             android:name=".BootReminderReceiver"
