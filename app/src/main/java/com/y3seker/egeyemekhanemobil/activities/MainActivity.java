@@ -155,19 +155,6 @@ public class MainActivity extends RxAppCompatActivity
         setupUsers();
         setupCards();
         Utils.setupReminder(this, true);
-        /*
-        new MonthlyMenus().fetch(new MonthlyMenus.FetchListener() {
-            @Override
-            public void onFetchDone(List asd) {
-                Log.i(TAG, "onFetchDone: ");
-            }
-
-            @Override
-            public void onFetchFailed(Exception e) {
-                Log.e(TAG, "onFetchFailed: ", e);
-            }
-        });
-        */
     }
 
     private void setupUsers() {

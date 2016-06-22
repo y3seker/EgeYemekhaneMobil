@@ -70,10 +70,6 @@ public class RetrofitManager {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         okHttpClient.setCookieHandler(cookieManager);
         okHttpClient.interceptors().add(new HandlerResponseInterceptor());
-        // this may not work
-        //okHttpClient.setCache(new Cache(ThisApplication.cacheDir, 1024));
-        //okHttpClient.setConnectTimeout(10, TimeUnit.SECONDS);
-        //okHttpClient.setReadTimeout(10, TimeUnit.SECONDS);
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrlManager)
                 .client(okHttpClient)
