@@ -24,8 +24,8 @@ android {
         applicationId "com.y3seker.egeyemekhanemobil"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 11
-        versionName "b1.07"
+        versionCode 12
+        versionName "b1.1"
     }
     buildTypes {
         release {
