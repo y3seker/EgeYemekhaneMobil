@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +37,6 @@ import android.widget.Toast;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.RequestBody;
 import com.trello.rxlifecycle.ActivityEvent;
-import com.y3seker.egeyemekhanemobil.Connection;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.OrderItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -53,7 +53,6 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
@@ -84,6 +83,8 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     private static final String TAG = OrderActivity.class.getSimpleName();
 
     private List<OrderItem> orderItems;
+    private List<String> spinnerValues, spinnerLabels;
+    private ArrayAdapter<String> aa;
     private OrderGridAdapter rvAdapter;
     private boolean inProgress = false;
     private CoordinatorLayout.LayoutParams fabLP;
@@ -112,6 +113,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     CompositeSubscription postSubs;
     Subscription firstPageSub;
     List<Subscription> subs;
+    Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +124,15 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         postSubs = new CompositeSubscription();
         orderItems = new ArrayList<>();
         subs = new ArrayList<>();
+        spinnerValues = new ArrayList<String>();
+        spinnerLabels = new ArrayList<String>();
         recyclerView.setLayoutManager(new WrappableGridLayoutManager(this, 5));
         rvAdapter = new OrderGridAdapter(this, R.layout.row_order_grid, orderItems);
         recyclerView.setAdapter(rvAdapter);
+        spinnerLabels.add(getString(R.string.meals));
+        aa = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, spinnerLabels);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(aa);
         spinner.setOnItemSelectedListener(this);
         rvAdapter.setCheckerListener(new OrderActivity.CheckerListener() {
             @Override
@@ -145,6 +153,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         });
         fabLP = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         dismissProgressDialog();
+        getFirstPage(0);
     }
 
     private void showItemsMenu(final OrderItem item) {
@@ -190,21 +199,27 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                 });
     }
 
-    private void parseAndShowMenu(Document doc) {
-
-    }
-
     private void getFirstPage(final int menuType) {
+        dismissSnackbar();
         showProgressBar();
         unsubscribeAll();
         firstPageSub = RetrofitManager.api().getOrder().cache()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
                     public Observable<?> call(Document document) {
+                        spinnerValues.clear();
+                        spinnerLabels.clear();
+                        Elements inputs = document.select("input[type=\"radio\"]");
+                        for (Element input : inputs) {
+                            spinnerLabels.add(document.select("label[for=\"" +
+                                    input.attr("id") + "\"]").text());
+                            spinnerValues.add(input.attr("value"));
+                        }
                         user.setViewStates(ParseUtils.extractViewState((document)));
                         RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                                 .add("ctl00$ContentPlaceHolder1$Button1", "İleri")
-                                .add("ctl00$ContentPlaceHolder1$osec", "RadioButton" + menuType)
+                                .add("ctl00$ContentPlaceHolder1$osec",
+                                        spinnerValues.isEmpty() ? "RadioButton2" : spinnerValues.get(menuType))
                                 .build();
                         return RetrofitManager.api().postOrder(requestBody);
                     }
@@ -231,6 +246,8 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                     @Override
                     public void onDone(Document document) {
                         super.onDone(document);
+                        aa.notifyDataSetChanged();
+                        spinner.setSelection(menuType, true);
                         parseAndUpdateUI(document);
                     }
                 });
@@ -264,7 +281,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                         dateString = dateString.replaceFirst("\\.", ".0");
                     if (dateString.length() == 9)
                         dateString = "0" + dateString;
-                    Log.i(TAG, isDisabled + " MENU URL " + menuUrl);
+                    // Log.i(TAG, isDisabled + " MENU URL " + menuUrl);
                     orderItems.add(new OrderItem(item.text(), item.select("span").select("input").attr("name"),
                             dateString, isDisabled, isOrderedBefore, menuUrl));
                 }
@@ -387,7 +404,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     }
 
     private void cancelTheOrder() {
-        showProgressDialog("Sipariş İptal Ediliyor");
+        showProgressDialog(getString(R.string.canceling_order));
         RetrofitManager.api().getOrder()
                 .retry(3)
                 .compose(this.bindToLifecycle())
@@ -398,8 +415,8 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                     @Override
                     public void onException(Throwable e) {
                         super.onException(e);
-                        restart();
                         rvAdapter.clearList();
+                        restart();
                     }
 
                     @Override
@@ -407,13 +424,13 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                         super.onDone(document);
                         dismissProgressDialog();
                         rvAdapter.clearList();
-                        getFirstPage(getMenuType());
+                        getFirstPage(getMealSelection());
                     }
                 });
     }
 
     private void verifyTheOrder() {
-        showProgressDialog("Sipariş Onaylanıyor");
+        showProgressDialog(getString(R.string.verifing_order));
         RequestBody verifyOrderBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                 .add(EVENT_TARGET, "ctl00$ContentPlaceHolder1$Button6")
                 .add(EVENT_ARG, "")
@@ -430,7 +447,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                         super.onException(e);
                         dismissProgressDialog();
                         if (e instanceof OrderSessionException) {
-                            getFirstPage(getMenuType());
+                            getFirstPage(getMealSelection());
                             Snackbar.make(coLayout, "Beklenmedik bir hata oluştu, lütfen siparişi tekrarlayın.",
                                     Snackbar.LENGTH_LONG).show();
                         } else if (e instanceof RequestBlockedException) {
@@ -471,24 +488,29 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                 .show();
     }
 
+    private void dismissSnackbar(){
+        if(snackbar != null)
+            snackbar.dismiss();
+    }
+
     public void onFailed(String why, int duration, View.OnClickListener actionListener) {
-        Snackbar.make(coLayout, why, duration)
-                .setAction(R.string.try_again, actionListener)
-                .show();
+        snackbar = Snackbar.make(coLayout, why, duration)
+                .setAction(R.string.try_again, actionListener);
+        snackbar.show();
     }
 
     public void onFailed(int message, int duration, View.OnClickListener actionListener) {
         onFailed(getString(message), duration, actionListener);
     }
 
-    public int getMenuType() {
-        return spinner.getSelectedItemPosition() + 2;
+    public int getMealSelection() {
+        return spinner.getSelectedItemPosition();
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         hideFab();
-        getFirstPage(position + 1);
+        getFirstPage(position);
     }
 
     private void unsubscribeAll() {
@@ -535,4 +557,6 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
         void onLongClick(OrderItem item, int pos);
     }
+
+
 }

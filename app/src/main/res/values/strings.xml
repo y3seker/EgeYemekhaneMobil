@@ -26,6 +26,7 @@
     <string name="password">Parola</string>
     <string name="login">Giriş</string>
     <string name="cancel">Iptal</string>
+    <string name="caf0">Personel Yemekhanesi</string>
     <string name="caf1">1 Nolu Yemekhane</string>
     <string name="caf2">2 Nolu Yemekhane</string>
     <string name="try_again">Tekrar Dene</string>
@@ -37,6 +38,7 @@
     <string name="breakfast">Kahvaltı</string>
     <string name="lunch">Öğle</string>
     <string name="dinner">Akşam</string>
+
     <string name="congrats">Tebrikler!</string>
     <string name="exit">Çıkış</string>
     <string name="hello">Merhaba!</string>
@@ -45,7 +47,7 @@
     <string name="logout">Çıkış Yap</string>
     <string name="delete">Sil</string>
     <string name="close">Kapat</string>
-    <string name="logging_in">Giriş Yapılıyor…</string>
+    <string name="logging_in">Giriş Yapılıyor</string>
     <string name="order_menu">Yemek Sipariş</string>
     <string name="cancel_order">Yemek Iptal</string>
     <string name="caf_history">Yemekhane Hareketleri</string>
@@ -53,8 +55,7 @@
     <string name="balance_history">Bakiye Hareketleri</string>
     <string name="logging_out">Çıkış Yapılıyor</string>
     <string name="no_cancel_items">İptal Edilebilecek Öğün Yok</string>
-    <string name="caf0">Personel Yemekhanesi</string>
-    <string name="user_deleted">"Kullanıcı Silindi: "</string>
+    <string name="user_deleted">Kullanıcı Silindi: </string>
     <string name="add_account">Hesap Ekle</string>
     <string name="no_result">Kriterlere Uygun Sonuç Yok!</string>
     <string name="cant_be_empty">Bu Kısım Boş Olamaz</string>
@@ -89,10 +90,8 @@
     <string name="feedback_title">Ege Yemekhane Mobil Geri Bildirim</string>
     <string name="feedback_cant_send">Geri Bildirim Gönderilemiyor.</string>
     <string name="no_menu_found">Yemek Bulunamadı.</string>
+    <string name="meals">Öğünler</string>
+    <string name="canceling_order">Sipariş İptal Ediliyor</string>
+    <string name="verifing_order">Sipariş Onaylanıyor</string>
 
-</resources><!--
-           <br>
-           <h2><a href=""></a></h2>
-           <p></p>
-
-           -->
+</resources>

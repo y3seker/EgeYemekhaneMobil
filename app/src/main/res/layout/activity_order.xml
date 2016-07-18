@@ -64,12 +64,12 @@
                         app:contentPaddingRight="16dp"
                         app:theme="@style/AppTheme.LightOverlay">
 
+                        <!-- Removed for dynamic listing -> android:entries="@array/menu_types" -->
                         <android.support.v7.widget.AppCompatSpinner
                             android:id="@+id/order_spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:entries="@array/menu_types"
                             android:padding="16dp"
                             app:popupTheme="@style/AppTheme.PopupOverlay" />
                     </android.support.v7.widget.CardView>
