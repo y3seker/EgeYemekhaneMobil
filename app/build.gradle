@@ -26,6 +26,14 @@ android {
         targetSdkVersion 23
         versionCode 12
         versionName "b1.1"
+
+        /*
+        * Enables Jack, disables Instant Run :(
+        *
+        jackOptions {
+            enabled true
+        }
+        */
     }
     buildTypes {
         release {
@@ -33,6 +41,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    /*
+    * For Jack
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }*/
 }
 buildscript {
     repositories {

@@ -24,12 +24,12 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.squareup.okhttp.RequestBody;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
+import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.MyActsItem;
+import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.ui.MyActsRVAdapter;
+import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

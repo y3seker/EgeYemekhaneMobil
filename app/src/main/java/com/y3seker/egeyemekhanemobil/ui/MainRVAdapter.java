@@ -24,7 +24,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.y3seker.egeyemekhanemobil.R;
@@ -33,8 +32,6 @@ import com.y3seker.egeyemekhanemobil.models.MyActsItem;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 
 import java.util.List;
-
-import butterknife.ButterKnife;
 
 /**
  * Created by Yunus Emre Şeker on 26.10.2015.

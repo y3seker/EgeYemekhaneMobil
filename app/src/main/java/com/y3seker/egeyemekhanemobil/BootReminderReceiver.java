@@ -19,7 +19,6 @@ package com.y3seker.egeyemekhanemobil;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 

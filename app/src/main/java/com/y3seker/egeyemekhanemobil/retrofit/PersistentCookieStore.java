@@ -20,8 +20,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.y3seker.egeyemekhanemobil.SerializableHttpCookie;
-
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;

@@ -31,14 +31,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.android.internal.util.Predicate;
 import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.R;
+import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
+import com.y3seker.egeyemekhanemobil.ui.MenuRVAdapter;
 import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
-import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
-import com.y3seker.egeyemekhanemobil.ui.MenuRVAdapter;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -46,12 +45,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

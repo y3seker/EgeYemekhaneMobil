@@ -16,17 +16,15 @@
 
 package com.y3seker.egeyemekhanemobil.retrofit;
 
-import android.util.Log;
-
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.OrderSessionException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.RequestBlockedException;
+import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

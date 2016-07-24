@@ -18,7 +18,6 @@ package com.y3seker.egeyemekhanemobil.ui;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,14 +27,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.y3seker.egeyemekhanemobil.BuildConfig;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.activities.OrderActivity;
-import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.models.OrderItem;
-import com.y3seker.egeyemekhanemobil.utils.Utils;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 

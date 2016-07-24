@@ -19,8 +19,8 @@ package com.y3seker.egeyemekhanemobil.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
-import com.y3seker.egeyemekhanemobil.SerializableHttpCookie;
 
 import java.net.HttpCookie;
 import java.util.HashMap;

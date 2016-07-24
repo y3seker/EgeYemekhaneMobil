@@ -34,16 +34,16 @@ import android.widget.ProgressBar;
 
 import com.squareup.okhttp.Call;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
-import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
-import com.y3seker.egeyemekhanemobil.utils.AnimUtils;
-import com.y3seker.egeyemekhanemobil.utils.Utils;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
+import com.y3seker.egeyemekhanemobil.utils.AnimUtils;
+import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
+import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
+import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.nodes.Document;
 

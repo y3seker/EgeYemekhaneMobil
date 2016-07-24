@@ -18,7 +18,6 @@ package com.y3seker.egeyemekhanemobil;
 
 import android.util.Log;
 
-import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;

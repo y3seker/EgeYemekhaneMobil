@@ -26,13 +26,12 @@ import android.widget.Toast;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.Database;
-import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.constants.RequestCodes;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
+import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 
 import org.jsoup.nodes.Document;

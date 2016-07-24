@@ -20,7 +20,6 @@ import android.util.Log;
 
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.RequestBody;
-import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import com.y3seker.egeyemekhanemobil.models.User;
@@ -31,10 +30,8 @@ import org.jsoup.nodes.Document;
 import java.util.HashMap;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.observers.Subscribers;
 import rx.schedulers.Schedulers;
 
 /**

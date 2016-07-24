@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2015 Fran Montiel
+ * Copyright 2015 Yunus Emre Şeker. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.y3seker.egeyemekhanemobil;
+package com.y3seker.egeyemekhanemobil.retrofit;
 /**
  * Based on the code from this stackoverflow answer http://stackoverflow.com/a/25462286/980387 by janoliver
  * Modifications in the structure of the class and addition of serialization of httpOnly attribute

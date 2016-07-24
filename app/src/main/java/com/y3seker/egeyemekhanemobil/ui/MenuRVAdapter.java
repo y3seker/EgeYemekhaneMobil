@@ -17,24 +17,18 @@
 package com.y3seker.egeyemekhanemobil.ui;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.squareup.okhttp.internal.Util;
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.activities.MyMenusActivity;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

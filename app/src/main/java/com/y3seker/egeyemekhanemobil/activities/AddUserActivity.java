@@ -26,19 +26,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatSpinner;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.y3seker.egeyemekhanemobil.SerializableHttpCookie;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.R;
+import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
+import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 

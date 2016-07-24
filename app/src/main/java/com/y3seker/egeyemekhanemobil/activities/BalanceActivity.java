@@ -20,18 +20,17 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.squareup.okhttp.RequestBody;
 import com.trello.rxlifecycle.ActivityEvent;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
+import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.BalanceItem;
+import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.ui.BalanceRVAdapter;
+import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

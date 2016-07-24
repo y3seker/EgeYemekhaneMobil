@@ -28,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.activities.MyActsActivity;
 import com.y3seker.egeyemekhanemobil.models.MyActsItem;
 
 import java.util.List;

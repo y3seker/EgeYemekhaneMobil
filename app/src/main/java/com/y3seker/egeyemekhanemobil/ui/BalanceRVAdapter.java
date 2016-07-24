@@ -20,23 +20,18 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.BalanceItem;
 
 import java.util.List;
-
-import butterknife.ButterKnife;
 
 /**
  * Created by Yunus Emre Şeker on 24.10.2015.

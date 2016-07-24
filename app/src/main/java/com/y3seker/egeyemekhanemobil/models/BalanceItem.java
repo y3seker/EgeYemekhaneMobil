@@ -19,7 +19,6 @@ package com.y3seker.egeyemekhanemobil.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.squareup.okhttp.internal.Util;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.select.Elements;
