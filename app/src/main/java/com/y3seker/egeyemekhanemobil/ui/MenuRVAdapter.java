@@ -28,9 +28,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.squareup.okhttp.internal.Util;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.activities.MyMenusActivity;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
+import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,11 +43,10 @@ import java.util.List;
  */
 public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<MyMenusItem> items;
-    int itemLayoutID;
-    int lastPosition = -1;
+    private List<MyMenusItem> items;
+    private int itemLayoutID;
 
-    int grey, accent;
+    private int grey, accent;
 
     public MenuRVAdapter(Context c, int itemLayoutID, List<MyMenusItem> items) {
         this.itemLayoutID = itemLayoutID;
@@ -57,7 +58,6 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void changeList(List<MyMenusItem> items) {
         this.items = items;
-        lastPosition = -1;
         notifyDataSetChanged();
     }
 
@@ -77,11 +77,20 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (holder instanceof Menu_Holder) {
             Menu_Holder holder1 = (Menu_Holder) holder;
             MyMenusItem myMenusItem = items.get(position);
-            holder1.date.setText(myMenusItem.dateString);
-            holder1.balance.setText(myMenusItem.balance);
+            holder1.date.setText(Utils.myMenusDateStringFormat.format(myMenusItem.date.getTime()));
+
             holder1.dinner.setTextColor(myMenusItem.dinner ? accent : grey);
             holder1.lunch.setTextColor(myMenusItem.lunch ? accent : grey);
             holder1.breakfast.setTextColor(myMenusItem.breakfast ? accent : grey);
+            holder1.iftar.setTextColor(myMenusItem.iftar ? accent : grey);
+
+            /*
+            // Toogles the visibility of menus
+            holder1.dinner.setVisibility(myMenusItem.dinner ? View.VISIBLE : View.GONE);
+            holder1.lunch.setVisibility(myMenusItem.lunch ? View.VISIBLE : View.GONE);
+            holder1.breakfast.setVisibility(myMenusItem.breakfast ? View.VISIBLE : View.GONE);
+            holder1.iftar.setVisibility(myMenusItem.iftar ? View.VISIBLE : View.GONE);
+            */
         }
     }
 
@@ -90,14 +99,14 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return items.size();
     }
 
-    public static class Menu_Holder extends RecyclerView.ViewHolder {
-        public TextView date, breakfast, lunch, dinner, balance;
-        public CardView card;
+    private static class Menu_Holder extends RecyclerView.ViewHolder {
+        TextView date, breakfast, lunch, dinner, iftar;
+        CardView card;
 
-        public Menu_Holder(View itemView) {
+        Menu_Holder(View itemView) {
             super(itemView);
             this.date = (TextView) itemView.findViewById(R.id.mymenus_row_date);
-            this.balance = (TextView) itemView.findViewById(R.id.mymenus_row_balance);
+            this.iftar = (TextView) itemView.findViewById(R.id.mymenus_row_iftar);
             this.card = (CardView) itemView.findViewById(R.id.mymenus_row_card);
             this.lunch = (TextView) itemView.findViewById(R.id.mymenus_row_lunch);
             this.dinner = (TextView) itemView.findViewById(R.id.mymenus_row_dinner);

@@ -49,7 +49,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.BuildConfig;
 import com.y3seker.egeyemekhanemobil.Database;
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.SerializableHttpCookie;
+import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
@@ -218,16 +218,17 @@ public class MainActivity extends RxAppCompatActivity
 
                     @Override
                     public void onNext(Document document) {
-                        Map<String, MyMenusItem> map = MyMenusActivity.parseMenus(document);
-                        if (map != null) {
-                            for (MyMenusItem menusItem : map.values()) {
+
+                        ArrayList<MyMenusItem> menusItems = MyMenusActivity.parseMenus(document);
+                        if (menusItems != null) {
+                            for (MyMenusItem menusItem : menusItems) {
                                 menusItem.dateString = getString(R.string.mymenus_today);
                                 userMenus.put(currentUser, menusItem);
                                 mainList.add(menusItem);
                                 mainRVAdapter.notifyItemChanged(0);
                             }
                         } else {
-                            MyMenusItem noMenu = new MyMenusItem(getString(R.string.mymenus_today), false, false, false);
+                            MyMenusItem noMenu = new MyMenusItem(getString(R.string.mymenus_today));
                             userMenus.put(currentUser, noMenu);
                             mainList.add(noMenu);
                             mainRVAdapter.notifyItemChanged(0);

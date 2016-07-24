@@ -18,40 +18,42 @@ package com.y3seker.egeyemekhanemobil.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import org.jsoup.select.Elements;
+
+import java.util.Calendar;
 
 /**
  * Created by Yunus Emre Şeker on 19.10.2015.
  * -
  */
-public class MyMenusItem implements Parcelable {
+public class MyMenusItem implements Parcelable, Comparable {
 
     public String dateString, from, balance;
-    public boolean breakfast, lunch, dinner;
+    public boolean breakfast = false, lunch = false, dinner = false, iftar = false;
+    public Calendar date;
 
     public MyMenusItem(Elements elements) {
         this.from = elements.get(0).text();
         this.balance = elements.get(1).text();
         this.dateString = elements.get(2).text();
-        String mType = elements.get(3).text();
-        setMeals(mType);
+        setMeals(elements.get(3).text());
     }
 
-    public MyMenusItem(String dateString, boolean dinner, boolean lunch, boolean breakfast) {
-        this.dateString = dateString;
-        this.dinner = dinner;
-        this.lunch = lunch;
-        this.breakfast = breakfast;
+    public MyMenusItem(Calendar date, Elements elements) {
+        this(elements);
+        this.date = date;
     }
 
-    protected MyMenusItem(Parcel in) {
+    private MyMenusItem(Parcel in) {
         dateString = in.readString();
         from = in.readString();
         balance = in.readString();
         breakfast = in.readByte() != 0;
         lunch = in.readByte() != 0;
         dinner = in.readByte() != 0;
+        iftar = in.readByte() != 0;
     }
 
     public static final Creator<MyMenusItem> CREATOR = new Creator<MyMenusItem>() {
@@ -66,9 +68,14 @@ public class MyMenusItem implements Parcelable {
         }
     };
 
+    public MyMenusItem(String string) {
+        this.dateString = string;
+    }
+
+
     public void setMeals(String s) {
         switch (s) {
-            case "iftar":
+            case "Kahvaltı":
                 breakfast = true;
                 break;
             case "Öğlen":
@@ -76,6 +83,9 @@ public class MyMenusItem implements Parcelable {
                 break;
             case "Akşam":
                 dinner = true;
+                break;
+            case "iftar":
+                iftar = true;
                 break;
             default:
                 break;
@@ -95,6 +105,12 @@ public class MyMenusItem implements Parcelable {
         dest.writeByte((byte) (breakfast ? 1 : 0));
         dest.writeByte((byte) (lunch ? 1 : 0));
         dest.writeByte((byte) (dinner ? 1 : 0));
+        dest.writeByte((byte) (iftar ? 1 : 0));
+    }
+
+    @Override
+    public int compareTo(@NonNull Object another) {
+        return this.date.compareTo(((MyMenusItem) another).date);
     }
 
 }

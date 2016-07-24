@@ -31,6 +31,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import com.android.internal.util.Predicate;
 import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -45,6 +46,8 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +70,6 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     private DatePickerDialog fromDatePickerDialog, toDatePickerDialog;
     private Calendar fromDate, toDate;
     private boolean isFirstPageLoaded;
-    private String URL;
 
     @Bind(R.id.root_layout)
     CoordinatorLayout coLayout;
@@ -84,7 +86,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     @Bind(R.id.mymenus_rv)
     RecyclerView recyclerView;
 
-    Map<String, MyMenusItem> myMenuz;
+    ArrayList<MyMenusItem> myMenuz;
     MenuRVAdapter rvAdapter;
     Snackbar noResultSnackBar;
     CoordinatorLayout.LayoutParams fabLP;
@@ -96,10 +98,10 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
         ButterKnife.bind(this);
         setupToolbar(toolbar, "");
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        myMenuz = new TreeMap<>();
+        myMenuz = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        rvAdapter = new MenuRVAdapter(this, R.layout.row_mymenus, new ArrayList<>(myMenuz.values()));
+        rvAdapter = new MenuRVAdapter(this, R.layout.row_mymenus, myMenuz);
         recyclerView.setAdapter(rvAdapter);
         isFirstPageLoaded = false;
         setupPickers();
@@ -188,31 +190,34 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
             noResultSnackBar.show();
             return;
         }
-        List<MyMenusItem> myMenusItemList = new ArrayList<>(myMenuz.values());
-        rvAdapter.changeList(myMenusItemList);
+        rvAdapter.changeList(myMenuz);
         hideProgressBar();
         toolbar.setTitle(doc.select("[class=ogunust]").first().text());
     }
 
-    public static Map<String, MyMenusItem> parseMenus(Document doc) throws NullPointerException {
-        Map<String, MyMenusItem> map = new TreeMap<>();
+    public static ArrayList<MyMenusItem> parseMenus(Document doc) throws NullPointerException {
+        ArrayList<MyMenusItem> items = new ArrayList<>();
         if (doc.getElementById(NO_RESULT) != null && doc.getElementById(NO_RESULT).hasText()) {
             return null;
         }
+
         Element table = doc.getElementById("ctl00_ContentPlaceHolder1_GridView1").child(0);
         final Elements list = table.children();
         list.remove(0);
 
         for (Element element : list) {
-            String date = element.children().get(2).text();
-            String rDate = Utils.getReverseDateString(date); //Utils.getReverseDateString(date);
-            if (map.containsKey(rDate)) {
-                map.get(rDate).setMeals(element.children().get(3).text());
+            String dateString = element.children().get(2).text();
+            String[] dateFields = dateString.split("\\.");
+            Calendar c = Calendar.getInstance();
+            c.set(Integer.parseInt(dateFields[2]), Integer.parseInt(dateFields[1]) - 1, Integer.parseInt(dateFields[0]));
+            MyMenusItem mmi = Utils.findMyMenusItem(items,c);
+            if (mmi != null) {
+                mmi.setMeals(element.children().get(3).text());
             } else {
-                map.put(rDate, new MyMenusItem(element.children()));
+                items.add(new MyMenusItem(c, element.children()));
             }
         }
-        return map;
+        return items;
     }
 
     public static RequestBody getMyMenusRequestBody(HashMap<String, String> viewStates, Calendar from, Calendar to) {

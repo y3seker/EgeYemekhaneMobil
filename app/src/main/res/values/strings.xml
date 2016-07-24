@@ -93,5 +93,6 @@
     <string name="meals">Öğünler</string>
     <string name="canceling_order">Sipariş İptal Ediliyor</string>
     <string name="verifing_order">Sipariş Onaylanıyor</string>
+    <string name="iftar">İftar</string>
 
 </resources>
