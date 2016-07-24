@@ -22,6 +22,7 @@ import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
+import java.util.concurrent.TimeUnit;
 
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
@@ -69,6 +70,9 @@ public class RetrofitManager {
         cookieManager = new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         okHttpClient.setCookieHandler(cookieManager);
+        okHttpClient.setConnectTimeout(5, TimeUnit.SECONDS);
+        okHttpClient.setReadTimeout(5, TimeUnit.SECONDS);
+        okHttpClient.setWriteTimeout(5, TimeUnit.SECONDS);
         okHttpClient.interceptors().add(new HandlerResponseInterceptor());
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrlManager)

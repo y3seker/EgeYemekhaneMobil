@@ -53,7 +53,7 @@ public final class ConnectionUtils {
                         return RetrofitManager.api().postLogin(requestBody);
                     }
                 })
-                .retry(2)
+                .retry(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

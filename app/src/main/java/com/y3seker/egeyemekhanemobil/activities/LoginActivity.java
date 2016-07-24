@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.Database;
+import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.constants.RequestCodes;
@@ -49,7 +50,7 @@ import rx.Subscriber;
 public class LoginActivity extends RxAppCompatActivity {
 
     public static final String ADD_USER_ACTION = "add_user";
-    public static final String LOGIN_FAILED_ACION = "login_failed";
+    public static final String LOGIN_FAILED_ACTION = "login_failed";
     public static final String LOGIN_SUCCEED_ACTION = "login_succeed";
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -96,7 +97,7 @@ public class LoginActivity extends RxAppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Log.d(TAG, "Login Failed");
-                        startActivity(LOGIN_FAILED_ACION);
+                        startActivity(LOGIN_FAILED_ACTION);
                         e.printStackTrace();
                     }
 
@@ -148,7 +149,7 @@ public class LoginActivity extends RxAppCompatActivity {
                 db.insertUser(user);
                 startActivity(LOGIN_SUCCEED_ACTION);
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Uygulamayı kullanabilmek için üyelik eklemelisiniz.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.add_account_to_use, Toast.LENGTH_SHORT).show();
                 //finish();
             }
         }

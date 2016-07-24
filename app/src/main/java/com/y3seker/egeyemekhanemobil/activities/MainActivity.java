@@ -173,7 +173,7 @@ public class MainActivity extends RxAppCompatActivity
                 defaultUser = user;
         }
 
-        if (getIntent().getAction().equals(LoginActivity.LOGIN_FAILED_ACION)) {
+        if (getIntent().getAction().equals(LoginActivity.LOGIN_FAILED_ACTION)) {
             setCurrentUser(defaultUser != null ? defaultUser : users.get(0));
         }
     }
