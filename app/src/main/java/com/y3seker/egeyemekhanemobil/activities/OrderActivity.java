@@ -448,11 +448,11 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                         dismissProgressDialog();
                         if (e instanceof OrderSessionException) {
                             getFirstPage(getMealSelection());
-                            Snackbar.make(coLayout, "Beklenmedik bir hata oluştu, lütfen siparişi tekrarlayın.",
+                            Snackbar.make(coLayout, R.string.error_retry_order,
                                     Snackbar.LENGTH_LONG).show();
                         } else if (e instanceof RequestBlockedException) {
                             restart();
-                            Snackbar.make(coLayout, "Beklenmedik bir hata oluştu, lütfen siparişi tekrarlayın.",
+                            Snackbar.make(coLayout, R.string.error_retry_order,
                                     Snackbar.LENGTH_LONG).show();
                         } else
                             onFailed(R.string.connection_error, Snackbar.LENGTH_LONG, null);

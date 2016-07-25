@@ -16,6 +16,7 @@
 
 package com.y3seker.egeyemekhanemobil.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -333,7 +334,7 @@ public class MainActivity extends RxAppCompatActivity
                 navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 break;
             case NO_USER:
-                navHeaderName.setText(R.string.hello);
+                navHeaderName.setText(R.string.add_account_to_use);
                 navHeaderUsername.setText("");
                 navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 menu.setGroupVisible(R.id.nav_group_login, false);
@@ -347,13 +348,14 @@ public class MainActivity extends RxAppCompatActivity
 
     }
 
+    @SuppressLint("StringFormatInvalid")
     private void afterLoginUpdateUI(final boolean isLoginSucceed) {
         progressDialog.dismiss();
         if (isLoginSucceed) {
             currentUser.setIsLoggedIn(true);
             updateNavigationView(LOGGED_IN);
             setCurrentUser(currentUser);
-            makeSnackBar("Giriş Yapıldı: " + currentUser.getName()).show();
+            makeSnackBar(String.format(getString(R.string.logged_in_as), currentUser.getName())).show();
         } else {
             currentUser.setIsLoggedIn(false);
             updateNavigationView(LOGGED_OUT);
@@ -522,20 +524,20 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private String getDeviceInfo() {
-        String s = "--------------------------";
+        String s1 = "";
         try {
-            s += "\nMARKA: " + android.os.Build.BRAND;
-            s += "\nMODEL: " + android.os.Build.MODEL;
-            s += "\nCIHAZ: " + android.os.Build.DEVICE;
-            s += "\nSURUM: " + android.os.Build.VERSION.RELEASE;
-            s += "\nVERSIYON: " + BuildConfig.VERSION_NAME + "(" + BuildConfig.VERSION_CODE + ")";
-            s += "\nBu bilgileri paylaşmak istemiyorsanız silebilirsiniz. \n" +
-                    "--------------------------\n\n";
+            s1 = String.format(getString(R.string.device_info),
+                    android.os.Build.BRAND,
+                    android.os.Build.MODEL,
+                    android.os.Build.DEVICE,
+                    android.os.Build.VERSION.RELEASE,
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.VERSION_CODE);
         } catch (Exception e) {
             Log.e(TAG, "Error getting Device INFO");
-            s = "";
+            s1 = "";
         }
-        return s;
+        return s1;
     }
 
     public void findNavItemPosition(MenuItem item, int[] pos) {

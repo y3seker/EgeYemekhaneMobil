@@ -94,5 +94,12 @@
     <string name="canceling_order">Sipariş İptal Ediliyor</string>
     <string name="verifing_order">Sipariş Onaylanıyor</string>
     <string name="iftar">İftar</string>
+    <string name="add_account_to_use">Uygulamayı kullanabilmek için üyelik eklemelisiniz.</string>
+    <string formatted="false" name="logged_in_as">Giriş Yapıldı: %s</string>
+    <string formatted="false" name="device_info">MARKA: %s\nMODEL: %s\nCIHAZ: %s\nSURUM: %s\nVERSIYON: %s (%d)\nBu bilgileri paylaşmak istemiyorsanız silebilirsiniz. \n</string>
+    <string name="unknown_error">Bir hata ile karşılaşıldı. Bu durum uygulamadan kaynaklı olmayabilir. Geçerli bir bağlantınız olduğundan eminseniz, daha sonra tekrar deneyin.</string>
+    <string name="error_message">\nHata Mesajı: </string>
+    <string name="cancel_menu">Öğün İptal</string>
+    <string name="error_retry_order">Beklenmedik bir hata oluştu, lütfen siparişi tekrarlayın.</string>
 
 </resources>

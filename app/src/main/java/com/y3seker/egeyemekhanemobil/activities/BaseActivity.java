@@ -229,19 +229,18 @@ public class BaseActivity extends RxAppCompatActivity {
     }
 
     public void onException(Exception e) {
-        String errorMessage = e.getMessage() != null ? "\nHata Mesajı: " + e.getMessage() : "";
+        String errorMessage = e.getMessage() != null ? getString(R.string.error_message) + e.getMessage() : "";
         new AlertDialog.Builder(this)
-                .setTitle("Hata!")
-                .setMessage("Bir hata ile karşılaşıldı. Bu durum uygulamadan kaynaklı olmayabilir. " +
-                        "Geçerli bir bağlantınız olduğundan eminseniz, daha sonra tekrar deneyin."
+                .setTitle(getString(R.string.error))
+                .setMessage(getString(R.string.unknown_error)
                         + errorMessage)
-                .setPositiveButton("Tekrar Dene", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.try_again), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         recreate();
                     }
                 })
-                .setNegativeButton("Kapat", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getString(R.string.close), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();

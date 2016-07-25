@@ -78,7 +78,7 @@ public class CancelActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cancel);
         ButterKnife.bind(this);
-        setupToolbar(toolbar, "Öğün İptal");
+        setupToolbar(toolbar, getString(R.string.cancel_menu));
         cancelItems = new ArrayList<>();
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
