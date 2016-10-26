@@ -46,6 +46,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.trello.rxlifecycle.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.BuildConfig;
 import com.y3seker.egeyemekhanemobil.Database;
@@ -54,6 +55,7 @@ import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.constants.RequestCodes;
+import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -64,6 +66,8 @@ import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -117,7 +121,6 @@ public class MainActivity extends RxAppCompatActivity
     TextView navHeaderUsername;
     MainRVAdapter mainRVAdapter;
 
-    List<Object> mainList;
     List<MenuItem> menuItems;
     List<User> users;
     Map<User, MyMenusItem> userMenus;
@@ -128,6 +131,7 @@ public class MainActivity extends RxAppCompatActivity
     ProgressDialog progressDialog;
     SharedPreferences cookiesPrefs, appPrefs;
 
+    private List<Object> cardList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,17 +183,20 @@ public class MainActivity extends RxAppCompatActivity
         }
     }
 
-    public void setupCards() {
-        mainList = new ArrayList<>();
+    private void setupCards() {
+        cardList = new ArrayList<>();
         mainRV.setLayoutManager(new LinearLayoutManager(this));
-        mainRVAdapter = new MainRVAdapter(this, mainList);
+        mainRVAdapter = new MainRVAdapter(this, cardList);
         mainRV.setAdapter(mainRVAdapter);
+        if (currentUser != null) {
+            addMenuCard("O");
+            addMenuCard("A");
+        }
     }
 
-    public void getUserInfo() {
+    private void getUserInfo() {
         if (userInfoSub != null && !userInfoSub.isUnsubscribed())
             userInfoSub.unsubscribe();
-
         userInfoSub = RetrofitManager.api().getMyMenus()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
@@ -200,7 +207,7 @@ public class MainActivity extends RxAppCompatActivity
                                         Utils.today, Utils.today));
                     }
                 })
-                .retry(1)
+                .retry(2)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
                 .subscribeOn(Schedulers.io())
@@ -225,20 +232,60 @@ public class MainActivity extends RxAppCompatActivity
                             for (MyMenusItem menusItem : menusItems) {
                                 menusItem.dateString = getString(R.string.mymenus_today);
                                 userMenus.put(currentUser, menusItem);
-                                mainList.add(menusItem);
-                                mainRVAdapter.notifyItemChanged(0);
+                                cardList.add(0, menusItem);
+                                mainRVAdapter.notifyItemInserted(0);
                             }
                         } else {
                             MyMenusItem noMenu = new MyMenusItem(getString(R.string.mymenus_today));
                             userMenus.put(currentUser, noMenu);
-                            mainList.add(noMenu);
-                            mainRVAdapter.notifyItemChanged(0);
+                            cardList.add(0, noMenu);
+                            mainRVAdapter.notifyItemInserted(0);
                         }
                     }
                 });
     }
 
-    public void setupDrawer() {
+    private void addMenuCard(final String menuType) {
+        final String date = Utils.orderDateFormat.format(Utils.today.getTime());
+        final String url = currentUser.getBaseUrl() +
+                String.format(UrlConstants.C_MENU, date, menuType);
+        RetrofitManager.api().getRequest(url)
+                .compose(this.bindUntilEvent(ActivityEvent.STOP))
+                .cast(Document.class)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Document>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "addMenuCard failed for " + url);
+                    }
+
+                    @Override
+                    public void onNext(Document document) {
+                        String menu;
+                        Element table = document.select("[id=lblTable]").first();
+                        if (table.children().size() == 0)
+                            menu = getString(R.string.no_menu_found);
+                        else {
+                            Elements menuRows = table.select("tbody").first().children();
+                            menuRows.remove(0);
+                            menu = (menuType.equals("O") ? "Öğle " : "Akşam ") + "Yemek Listesi\n\n";
+                            for (Element menuRow : menuRows) {
+                                menu += menuRow.text() + "\n";
+                            }
+                        }
+                        cardList.add(menu.trim());
+                        mainRVAdapter.notifyItemInserted(cardList.size() - 1);
+                    }
+                });
+    }
+
+    private void setupDrawer() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -291,8 +338,8 @@ public class MainActivity extends RxAppCompatActivity
         if (prevUser != null && menu.findItem(prevUser.hashCode()) != null) {
             Log.d(TAG, "user changed, prevUser: " + prevUser.getName());
             menu.findItem(prevUser.hashCode()).setIcon(R.drawable.ic_action_label_outline);
-            if (mainList.contains(userMenus.get(prevUser)))
-                mainList.remove(0);
+            if (cardList.contains(userMenus.get(prevUser)))
+                cardList.remove(0);
         }
         currentUser = user;
 
@@ -303,7 +350,7 @@ public class MainActivity extends RxAppCompatActivity
             else {
                 updateNavigationView(LOGGED_IN);
                 if (userMenus.containsKey(currentUser)) {
-                    mainList.add(userMenus.get(currentUser));
+                    cardList.add(0,userMenus.get(currentUser));
                     mainRVAdapter.notifyItemChanged(0);
                 } else {
                     getUserInfo();
