@@ -75,11 +75,4 @@ public interface ConnectionService {
     @POST(UrlConstants.C_YEMEKHANE_H)
     Observable<Document> postMyHistory(@Body RequestBody body);
 
-    @GET(UrlConstants.C_OGLE_MENU)
-    Observable<Document> getLunchMenus();
-
-    @GET(UrlConstants.C_AKSAM_MENU)
-    Observable<Document> getDinnerMenus();
-
-
 }

@@ -83,7 +83,8 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     private static final String TAG = OrderActivity.class.getSimpleName();
 
     private List<OrderItem> orderItems;
-    private List<String> spinnerValues, spinnerLabels;
+    private List<String> spinnerValues;
+    private List<String> spinnerLabels;
     private ArrayAdapter<String> aa;
     private OrderGridAdapter rvAdapter;
     private boolean inProgress = false;
@@ -110,10 +111,10 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     @Bind(R.id.order_rv)
     RecyclerView recyclerView;
 
-    CompositeSubscription postSubs;
-    Subscription firstPageSub;
-    List<Subscription> subs;
-    Snackbar snackbar;
+    private CompositeSubscription postSubs;
+    private Subscription firstPageSub;
+    private List<Subscription> subs;
+    private Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +160,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     private void showItemsMenu(final OrderItem item) {
 
         if (item.isMenuSet()) {
-            Toast.makeText(getBaseContext(), item.menu, Toast.LENGTH_LONG).show();
+            makeDialog(item.text, item.menu);
             return;
         }
 
@@ -194,7 +195,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                             }
                         }
                         item.setMenu(menu);
-                        Toast.makeText(getBaseContext(), menu, Toast.LENGTH_LONG).show();
+                        makeDialog(item.text, menu);
                     }
                 });
     }
@@ -488,22 +489,33 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                 .show();
     }
 
-    private void dismissSnackbar(){
-        if(snackbar != null)
+    private void dismissSnackbar() {
+        if (snackbar != null)
             snackbar.dismiss();
     }
 
-    public void onFailed(String why, int duration, View.OnClickListener actionListener) {
-        snackbar = Snackbar.make(coLayout, why, duration)
-                .setAction(R.string.try_again, actionListener);
+    private void onFailed(String why, int duration, View.OnClickListener actionListener) {
+        makeSnackBar(why, duration, getString(R.string.try_again), actionListener);
+    }
+
+    private void makeSnackBar(String message, int duration, String actionTitle, View.OnClickListener actionListener) {
+        snackbar = Snackbar.make(coLayout, message, duration)
+                .setAction(actionTitle, actionListener);
         snackbar.show();
     }
 
-    public void onFailed(int message, int duration, View.OnClickListener actionListener) {
+    private void makeDialog(String title, String message) {
+        new AlertDialog.Builder(this).setTitle(title)
+                .setMessage(message)
+                .create()
+                .show();
+    }
+
+    private void onFailed(int message, int duration, View.OnClickListener actionListener) {
         onFailed(getString(message), duration, actionListener);
     }
 
-    public int getMealSelection() {
+    private int getMealSelection() {
         return spinner.getSelectedItemPosition();
     }
 
@@ -557,6 +569,5 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
         void onLongClick(OrderItem item, int pos);
     }
-
 
 }

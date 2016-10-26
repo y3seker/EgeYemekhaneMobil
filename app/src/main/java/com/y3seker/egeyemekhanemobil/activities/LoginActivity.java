@@ -51,13 +51,14 @@ public class LoginActivity extends RxAppCompatActivity {
 
     public static final String ADD_USER_ACTION = "add_user";
     public static final String LOGIN_FAILED_ACTION = "login_failed";
-    public static final String LOGIN_SUCCEED_ACTION = "login_succeed";
+    private static final String LOGIN_SUCCEED_ACTION = "login_succeed";
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-    List<User> users;
-    User currentUser = null;
-    Database db;
-    SharedPreferences cookiesPrefs, appPrefs;
+    private List<User> users;
+    private User currentUser = null;
+    private Database db;
+    private SharedPreferences cookiesPrefs;
+    private SharedPreferences appPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

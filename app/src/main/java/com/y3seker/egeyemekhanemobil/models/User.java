@@ -56,7 +56,7 @@ public class User implements Parcelable {
         baseUrl = ConnectionUtils.findBaseUrl(cafeteriaNumber);
     }
 
-    protected User(Parcel in) {
+    private User(Parcel in) {
         viewStates = new HashMap<>();
         username = in.readString();
         password = in.readString();

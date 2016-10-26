@@ -52,7 +52,6 @@
             android:title="@string/caf_history" />
     </group>
     <group
-        android:id="@+id/nav_group_bottom"
         android:checkableBehavior="none"
         android:menuCategory="secondary">
         <item

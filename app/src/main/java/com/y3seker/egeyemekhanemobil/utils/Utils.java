@@ -28,6 +28,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.y3seker.egeyemekhanemobil.BuildConfig;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.ReminderReceiver;
 import com.y3seker.egeyemekhanemobil.activities.LoginActivity;
@@ -49,13 +50,15 @@ import java.util.TimeZone;
 public final class Utils {
 
     private static final String TAG = Utils.class.getSimpleName();
-
-    private static TimeZone trTimeZone;
-    private static Locale trLocale;
-    public static SimpleDateFormat myMenusDateFormat, myMenusDateStringFormat,
-            myMenusReverseDateFormat, orderDateFormat, balanceDateFormat;
-    public static DecimalFormat twoDigit;
-    public static Calendar today;
+    private static final SimpleDateFormat myMenusDateFormat;
+    public static final SimpleDateFormat myMenusDateStringFormat;
+    private static final SimpleDateFormat myMenusReverseDateFormat;
+    public static final SimpleDateFormat orderDateFormat;
+    public static final SimpleDateFormat balanceDateFormat;
+    public static final DecimalFormat twoDigit;
+    public static final Calendar today;
+    private static final TimeZone trTimeZone;
+    private static final Locale trLocale;
 
     static {
         trTimeZone = TimeZone.getTimeZone("Europe/Istanbul");
@@ -63,7 +66,7 @@ public final class Utils {
         twoDigit = new DecimalFormat("00");
         today = Calendar.getInstance(trTimeZone);
         myMenusDateFormat = new SimpleDateFormat("MM.dd.yyyy", trLocale);
-        myMenusDateStringFormat = new SimpleDateFormat("EEEEE, dd.MM.yyyy", trLocale);
+        myMenusDateStringFormat = new SimpleDateFormat("EE, dd.MM.yyyy", trLocale);
         myMenusReverseDateFormat = new SimpleDateFormat("yyyy.MM.dd", trLocale);
         balanceDateFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss", trLocale);
         orderDateFormat = new SimpleDateFormat("MM.dd.yyyy", trLocale);
@@ -94,16 +97,16 @@ public final class Utils {
         return splitted[2] + "." + splitted[1] + "." + splitted[0];
     }
 
-    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c){
+    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c) {
         for (MyMenusItem myMenusItem : list) {
-            if(myMenusItem.date.equals(c))
+            if (myMenusItem.date.equals(c))
                 return myMenusItem;
         }
         return null;
     }
 
 
-    public static void setupReminder(Context context) throws NumberFormatException {
+    private static void setupReminder(Context context) throws NumberFormatException {
         AlarmManager manager = (AlarmManager) context.getSystemService(Activity.ALARM_SERVICE);
         Intent intent = new Intent(context, ReminderReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
@@ -169,6 +172,15 @@ public final class Utils {
         if (!isTest)
             mBuilder.setContentIntent(pendingIntent);
         mNotificationManager.notify(87878787, mBuilder.build());
-        //Log.d("SERVICE", "Notify created!");
+    }
+
+    public static String getDeviceInfo(Context context) {
+        return String.format(context.getString(R.string.device_info),
+                android.os.Build.BRAND,
+                android.os.Build.MODEL,
+                android.os.Build.DEVICE,
+                android.os.Build.VERSION.RELEASE,
+                BuildConfig.VERSION_NAME,
+                BuildConfig.VERSION_CODE);
     }
 }

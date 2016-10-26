@@ -39,10 +39,11 @@ import java.util.List;
  */
 public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context mContext;
-    private List<Object> list;
+    private final Context mContext;
+    private final List<Object> list;
 
-    private int grey, accent;
+    private final int grey;
+    private final int accent;
 
 
     public MainRVAdapter(Context mContext, List<Object> list) {
@@ -65,6 +66,8 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return 2;
         } else if (o instanceof MyActsItem) {
             return 3;
+        } else if (o instanceof String) {
+            return 4;
         }
         return 0;
     }
@@ -81,6 +84,9 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             case 3:
                 View v3 = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_myacts, parent, false);
                 return new LastActHolder(v3);
+            case 4: // Todays Menu
+                View v4 = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_menu, parent, false);
+                return new TodaysMenuHolder(v4);
         }
         return null;
     }
@@ -94,6 +100,10 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder1.dinner.setTextColor(myMenusItem.dinner ? accent : grey);
             holder1.lunch.setTextColor(myMenusItem.lunch ? accent : grey);
             holder1.breakfast.setTextColor(myMenusItem.breakfast ? accent : grey);
+        } else if (holder instanceof TodaysMenuHolder) {
+            TodaysMenuHolder holder1 = (TodaysMenuHolder) holder;
+            String menu = (String) list.get(position);
+            holder1.menu.setText(menu);
         }
     }
 
@@ -104,7 +114,10 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public class MyMenusHolder extends RecyclerView.ViewHolder {
 
-        public TextView text, breakfast, lunch, dinner;
+        public final TextView text;
+        public final TextView breakfast;
+        public final TextView lunch;
+        public final TextView dinner;
 
         public MyMenusHolder(View itemView) {
             super(itemView);
@@ -115,9 +128,21 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    public class TodaysMenuHolder extends RecyclerView.ViewHolder {
+
+        public final TextView menu;
+
+        public TodaysMenuHolder(View itemView) {
+            super(itemView);
+            this.menu = (TextView) itemView.findViewById(R.id.todaysmenu_text);
+        }
+    }
+
     public class LastActHolder extends RecyclerView.ViewHolder {
-        TextView date, caf, menu_type;
-        CardView card;
+        final TextView date;
+        final TextView caf;
+        final TextView menu_type;
+        final CardView card;
 
         public LastActHolder(View itemView) {
             super(itemView);

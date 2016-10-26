@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PersistentCookieStore implements CookieStore {
+class PersistentCookieStore implements CookieStore {
     private static final String TAG = PersistentCookieStore.class
             .getSimpleName();
 
@@ -41,12 +41,12 @@ public class PersistentCookieStore implements CookieStore {
     private static final String SP_KEY_DELIMITER = "|"; // Unusual char in URL
     private static final String SP_KEY_DELIMITER_REGEX = "\\"
             + SP_KEY_DELIMITER;
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
 
     // In memory
     private Map<URI, Set<HttpCookie>> allCookies;
 
-    public PersistentCookieStore(Context context) {
+    private PersistentCookieStore(Context context) {
         sharedPreferences = context.getSharedPreferences(SP_COOKIE_STORE,
                 Context.MODE_PRIVATE);
         loadAllFromPersistence();
@@ -238,8 +238,8 @@ public class PersistentCookieStore implements CookieStore {
     @Override
     public synchronized boolean remove(URI uri, HttpCookie cookie) {
         Set<HttpCookie> targetCookies = allCookies.get(uri);
-        boolean cookieRemoved = targetCookies != null ? targetCookies
-                .remove(cookie) : false;
+        boolean cookieRemoved = targetCookies != null && targetCookies
+                .remove(cookie);
         if (cookieRemoved) {
             removeFromPersistence(uri, cookie);
         }

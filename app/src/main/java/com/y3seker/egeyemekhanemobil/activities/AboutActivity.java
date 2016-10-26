@@ -38,8 +38,8 @@ import butterknife.OnClick;
  */
 public class AboutActivity extends AppCompatActivity {
 
-    int i = 0;
-    long lastClick = 0;
+    private int i = 0;
+    private long lastClick = 0;
 
     @OnClick(R.id.about_license)
     void licensesClick() {
@@ -81,11 +81,6 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     public static class AboutFragment extends Fragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-        }
 
         @Nullable
         @Override

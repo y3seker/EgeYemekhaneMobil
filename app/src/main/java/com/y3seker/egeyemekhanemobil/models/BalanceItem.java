@@ -32,9 +32,14 @@ import java.util.Date;
  */
 public class BalanceItem implements Parcelable {
 
-    public String tarih, zaman, yer, islemOncesiBakiye, islemTutari, sonBakiye;
-    public String tarih_zaman;
-    public Date date;
+    public final String tarih;
+    public final String zaman;
+    public final String yer;
+    private String islemOncesiBakiye;
+    public String islemTutari;
+    public final String sonBakiye;
+    private String tarih_zaman;
+    private Date date;
 
     public BalanceItem(Elements elements) {
         this.tarih = elements.get(0).text();
@@ -60,7 +65,7 @@ public class BalanceItem implements Parcelable {
         this.sonBakiye = sonBakiye;
     }
 
-    protected BalanceItem(Parcel in) {
+    private BalanceItem(Parcel in) {
         tarih = in.readString();
         zaman = in.readString();
         yer = in.readString();

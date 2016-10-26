@@ -38,9 +38,10 @@ import java.util.List;
 public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<MyMenusItem> items;
-    private int itemLayoutID;
+    private final int itemLayoutID;
 
-    private int grey, accent;
+    private final int grey;
+    private final int accent;
 
     public MenuRVAdapter(Context c, int itemLayoutID, List<MyMenusItem> items) {
         this.itemLayoutID = itemLayoutID;
@@ -94,8 +95,12 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private static class Menu_Holder extends RecyclerView.ViewHolder {
-        TextView date, breakfast, lunch, dinner, iftar;
-        CardView card;
+        final TextView date;
+        final TextView breakfast;
+        final TextView lunch;
+        final TextView dinner;
+        final TextView iftar;
+        final CardView card;
 
         Menu_Holder(View itemView) {
             super(itemView);

@@ -39,18 +39,21 @@ import java.util.List;
  */
 public class BalanceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    int itemLayoutID;
-    int footerLayoutID;
+    private final int itemLayoutID;
+    private int footerLayoutID;
     int lastPosition = -1;
-    boolean hasPages;
-    boolean isLoading = false;
-    boolean isLoadingFailed = false;
-    boolean footerRemoved = false;
-    List<BalanceItem> items;
-    View.OnClickListener moreButtonListener;
-    Context mContext;
+    private boolean hasPages;
+    private boolean isLoading = false;
+    private boolean isLoadingFailed = false;
+    private boolean footerRemoved = false;
+    private final List<BalanceItem> items;
+    private View.OnClickListener moreButtonListener;
+    private final Context mContext;
 
-    public int RED, REDD, GREEN, GREEND;
+    private final int RED;
+    private final int REDD;
+    private final int GREEN;
+    private final int GREEND;
 
     public BalanceRVAdapter(Context mContext, int itemLayoutID, List<BalanceItem> items) {
         this.mContext = mContext;
@@ -172,13 +175,13 @@ public class BalanceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public static class BalanceHolder extends RecyclerView.ViewHolder {
-        TextView tarih;
-        TextView time;
-        TextView yer;
-        TextView islemTutari;
-        TextView sonBakiye;
-        View divider;
-        CardView card;
+        final TextView tarih;
+        final TextView time;
+        final TextView yer;
+        final TextView islemTutari;
+        final TextView sonBakiye;
+        final View divider;
+        final CardView card;
 
         public BalanceHolder(View itemView) {
             super(itemView);
@@ -193,10 +196,10 @@ public class BalanceRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public static class FooterHolder extends RecyclerView.ViewHolder {
-        TextView text;
-        TextView errorText;
-        ProgressBar loadingProgress;
-        CardView card;
+        final TextView text;
+        final TextView errorText;
+        final ProgressBar loadingProgress;
+        final CardView card;
 
         public FooterHolder(View itemView) {
             super(itemView);

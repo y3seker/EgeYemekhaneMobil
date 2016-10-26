@@ -30,11 +30,13 @@ import java.util.Calendar;
  */
 public class MyMenusItem implements Parcelable, Comparable {
 
-    public String dateString, from, balance;
+    public String dateString;
+    private String from;
+    private String balance;
     public boolean breakfast = false, lunch = false, dinner = false, iftar = false;
     public Calendar date;
 
-    public MyMenusItem(Elements elements) {
+    private MyMenusItem(Elements elements) {
         this.from = elements.get(0).text();
         this.balance = elements.get(1).text();
         this.dateString = elements.get(2).text();

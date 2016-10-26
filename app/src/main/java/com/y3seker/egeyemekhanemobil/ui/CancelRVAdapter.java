@@ -38,11 +38,11 @@ import java.util.List;
  */
 public class CancelRVAdapter extends RecyclerView.Adapter<CancelRVAdapter.CancelHolder> implements CompoundButton.OnCheckedChangeListener {
 
-    List<CancelItem> items;
-    int itemLayoutID;
-    int lastPosition = -1;
-    Context mContext;
-    CancelActivity.CheckedChangeListener checkedChangeListener;
+    private List<CancelItem> items;
+    private final int itemLayoutID;
+    private int lastPosition = -1;
+    private final Context mContext;
+    private CancelActivity.CheckedChangeListener checkedChangeListener;
 
     public CancelRVAdapter(Context c, int itemLayoutID, List<CancelItem> items) {
         this.mContext = c;
@@ -103,8 +103,8 @@ public class CancelRVAdapter extends RecyclerView.Adapter<CancelRVAdapter.Cancel
 
     public static class CancelHolder extends RecyclerView.ViewHolder {
 
-        AppCompatCheckBox checkBox;
-        CardView card;
+        final AppCompatCheckBox checkBox;
+        final CardView card;
 
         public CancelHolder(View itemView) {
             super(itemView);

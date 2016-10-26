@@ -40,11 +40,11 @@ import java.util.List;
  */
 public class OrderRVAdapter extends RecyclerView.Adapter<OrderRVAdapter.OrderHolder> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
-    List<OrderItem> items;
-    int itemLayoutID;
-    int lastPosition = -1;
-    Context mContext;
-    OrderActivity.CheckerListener checkerListener;
+    private List<OrderItem> items;
+    private final int itemLayoutID;
+    private int lastPosition = -1;
+    private final Context mContext;
+    private OrderActivity.CheckerListener checkerListener;
 
     public OrderRVAdapter(Context c, int itemLayoutID, List<OrderItem> items) {
         this.mContext = c;
@@ -126,10 +126,11 @@ public class OrderRVAdapter extends RecyclerView.Adapter<OrderRVAdapter.OrderHol
 
     public class OrderHolder extends RecyclerView.ViewHolder {
 
-        TextView text, checker;
-        ProgressBar progress;
+        final TextView text;
+        final TextView checker;
+        final ProgressBar progress;
 
-        CardView card;
+        final CardView card;
 
         public OrderHolder(View itemView) {
             super(itemView);

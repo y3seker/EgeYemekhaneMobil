@@ -55,14 +55,14 @@ public class BalanceActivity extends BaseActivity {
     @Bind(R.id.balance_rv)
     RecyclerView recyclerView;
 
-    boolean hasPages = false;
-    List<BalanceItem> balanceItemHistory;
-    int nextPage = 1;
-    Elements pages = null;
+    private boolean hasPages = false;
+    private List<BalanceItem> balanceItemHistory;
+    private int nextPage = 1;
+    private Elements pages = null;
 
     private boolean isLoadingPageFailed = false;
-    BalanceRVAdapter rvAdapter;
-    View.OnClickListener clickListener = new View.OnClickListener() {
+    private BalanceRVAdapter rvAdapter;
+    private final View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (!rvAdapter.isLoading()) {
@@ -152,7 +152,7 @@ public class BalanceActivity extends BaseActivity {
         toolbar.setTitle(doc.getElementById("ctl00_ContentPlaceHolder1_lblBakiye").text().replace(":", ": "));
     }
 
-    public void loadPage(final int nextPage) {
+    private void loadPage(final int nextPage) {
         rvAdapter.showLoadingFooter(true);
         RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                 .add(ParseConstants.EVENT_ARG, "Page$" + nextPage)

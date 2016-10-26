@@ -63,13 +63,13 @@ public class BaseActivity extends RxAppCompatActivity {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
 
-    public int[] revealPos;
-    public User user;
+    private int[] revealPos;
+    User user;
     private View rootView;
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
     ProgressBar progressBar;
-    Menu menu;
-    Map<String, Call> calls;
+    private Menu menu;
+    private Map<String, Call> calls;
     private boolean isClosing = false;
     private boolean isSavedState, isRestart = false;
 
@@ -105,8 +105,9 @@ public class BaseActivity extends RxAppCompatActivity {
             reveal(rootView, 850);
     }
 
-    public void reveal(final View view, final int duration) {
+    private void reveal(final View view, final int duration) {
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
                 if (Build.VERSION.SDK_INT >= 16) {
@@ -120,11 +121,11 @@ public class BaseActivity extends RxAppCompatActivity {
         });
     }
 
-    public void collapse(final View view, final int duration, final AnimUtils.AnimationListener listener) {
+    private void collapse(final View view, final int duration, final AnimUtils.AnimationListener listener) {
         AnimUtils.collapseTo(revealPos[0], revealPos[1], view, duration, listener);
     }
 
-    public void setupToolbar(Toolbar toolbar, String title) {
+    void setupToolbar(Toolbar toolbar, String title) {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -134,15 +135,15 @@ public class BaseActivity extends RxAppCompatActivity {
             getSupportActionBar().setTitle("");
     }
 
-    public void showProgressBar() {
+    void showProgressBar() {
         progressBar.setVisibility(View.VISIBLE);
     }
 
-    public void hideProgressBar() {
+    void hideProgressBar() {
         progressBar.setVisibility(View.GONE);
     }
 
-    public void showProgressDialog(final String message) {
+    void showProgressDialog(final String message) {
         progressDialog.setMessage(message);
         progressDialog.show();
     }
@@ -151,11 +152,11 @@ public class BaseActivity extends RxAppCompatActivity {
         showProgressDialog(getString(message));
     }
 
-    public void showProgressDialog() {
+    void showProgressDialog() {
         showProgressDialog(null);
     }
 
-    public void dismissProgressDialog() {
+    void dismissProgressDialog() {
         progressDialog.dismiss();
     }
 
@@ -195,11 +196,6 @@ public class BaseActivity extends RxAppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onBackPressed() {
         if (isClosing)
             return;
@@ -220,7 +216,7 @@ public class BaseActivity extends RxAppCompatActivity {
         });
     }
 
-    public void onFailed(int why, View.OnClickListener actionListener) {
+    void onFailed(int why, View.OnClickListener actionListener) {
         dismissProgressDialog();
         Utils.makeSnackBar(this, getString(why))
                 .setAction(R.string.try_again, actionListener)
@@ -228,7 +224,7 @@ public class BaseActivity extends RxAppCompatActivity {
                 .show();
     }
 
-    public void onException(Exception e) {
+    private void onException(Exception e) {
         String errorMessage = e.getMessage() != null ? getString(R.string.error_message) + e.getMessage() : "";
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error))
@@ -251,7 +247,7 @@ public class BaseActivity extends RxAppCompatActivity {
                 .show();
     }
 
-    public void restart() {
+    void restart() {
         recreate();
         overridePendingTransition(0, 0);
     }

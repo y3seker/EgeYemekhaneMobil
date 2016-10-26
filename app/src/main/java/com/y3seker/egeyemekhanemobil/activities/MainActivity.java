@@ -16,7 +16,6 @@
 
 package com.y3seker.egeyemekhanemobil.activities;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,7 +47,6 @@ import android.widget.Toast;
 
 import com.trello.rxlifecycle.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.y3seker.egeyemekhanemobil.BuildConfig;
 import com.y3seker.egeyemekhanemobil.Database;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
@@ -89,22 +87,11 @@ public class MainActivity extends RxAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOGGED_IN, LOGGED_OUT, LOGIN_FAILED, NO_USER, USER_DELETED})
-    public @interface SignState {
-    }
-
     private static final int LOGGED_IN = 1;
     private static final int LOGGED_OUT = 2;
     private static final int LOGIN_FAILED = 3;
     private static final int NO_USER = 4;
     private static final int USER_DELETED = 5;
-
-
-    @SignState
-    private int LOGIN_STATE;
-
     @Bind(R.id.main_appbar)
     AppBarLayout appBarLayout;
     @Bind(R.id.toolbar)
@@ -113,25 +100,24 @@ public class MainActivity extends RxAppCompatActivity
     ImageView mainImage;
     @Bind(R.id.main_rv)
     RecyclerView mainRV;
-
-    NavigationView navigationView;
-    DrawerLayout drawer;
-    Menu menu;
-    TextView navHeaderName;
-    TextView navHeaderUsername;
-    MainRVAdapter mainRVAdapter;
-
-    List<MenuItem> menuItems;
-    List<User> users;
-    Map<User, MyMenusItem> userMenus;
-    Subscription userInfoSub;
-    User currentUser;
-    Database database;
-    private Snackbar snackbar;
-    ProgressDialog progressDialog;
-    SharedPreferences cookiesPrefs, appPrefs;
-
+    private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private Menu menu;
+    private TextView navHeaderName;
+    private TextView navHeaderUsername;
+    private MainRVAdapter mainRVAdapter;
     private List<Object> cardList;
+    private List<MenuItem> menuItems;
+    private List<User> users;
+    private Map<User, MyMenusItem> userMenus;
+    private Subscription userInfoSub;
+    private User currentUser;
+    private Database database;
+    private ProgressDialog progressDialog;
+    private SharedPreferences cookiesPrefs;
+    private SharedPreferences appPrefs;
+    @SignState
+    private int LOGIN_STATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -314,7 +300,7 @@ public class MainActivity extends RxAppCompatActivity
         }
     }
 
-    public void toggleMenuAccounts() {
+    private void toggleMenuAccounts() {
         boolean isExpanded = menu.findItem(R.id.nav_add_acc).isVisible();
         if (Build.VERSION.SDK_INT == 17)
             navHeaderName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
@@ -395,7 +381,6 @@ public class MainActivity extends RxAppCompatActivity
 
     }
 
-    @SuppressLint("StringFormatInvalid")
     private void afterLoginUpdateUI(final boolean isLoginSucceed) {
         progressDialog.dismiss();
         if (isLoginSucceed) {
@@ -445,9 +430,8 @@ public class MainActivity extends RxAppCompatActivity
                 });
     }
 
-    public Snackbar makeSnackBar(String message) {
-        snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
-        return snackbar;
+    private Snackbar makeSnackBar(String message) {
+        return Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
     }
 
     @Override
@@ -537,7 +521,7 @@ public class MainActivity extends RxAppCompatActivity
                 Intent send = new Intent(Intent.ACTION_SENDTO);
                 String uriText = "mailto:" + Uri.encode("y3seker@gmail.com") +
                         "?subject=" + Uri.encode(getString(R.string.feedback_title)) +
-                        "&body=" + Uri.encode(getDeviceInfo());
+                        "&body=" + Uri.encode(Utils.getDeviceInfo(this));
                 Uri uri = Uri.parse(uriText);
                 send.setData(uri);
                 try {
@@ -570,24 +554,7 @@ public class MainActivity extends RxAppCompatActivity
         return true;
     }
 
-    private String getDeviceInfo() {
-        String s1 = "";
-        try {
-            s1 = String.format(getString(R.string.device_info),
-                    android.os.Build.BRAND,
-                    android.os.Build.MODEL,
-                    android.os.Build.DEVICE,
-                    android.os.Build.VERSION.RELEASE,
-                    BuildConfig.VERSION_NAME,
-                    BuildConfig.VERSION_CODE);
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting Device INFO");
-            s1 = "";
-        }
-        return s1;
-    }
-
-    public void findNavItemPosition(MenuItem item, int[] pos) {
+    private void findNavItemPosition(MenuItem item, int[] pos) {
         int posIndex = 1;
         NavigationMenuView navigationMenuView = (NavigationMenuView) navigationView.getChildAt(0);
         for (int i = 0; i < menu.size(); i++) {
@@ -636,5 +603,10 @@ public class MainActivity extends RxAppCompatActivity
                 .setPositiveButton(R.string.close, null)
                 .create();
         return builder;
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({LOGGED_IN, LOGGED_OUT, LOGIN_FAILED, NO_USER, USER_DELETED})
+    public @interface SignState {
     }
 }

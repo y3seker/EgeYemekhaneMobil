@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2015 Yunus Emre Şeker. All rights reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +14,18 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <alpha
-        android:duration="200"
-        android:fillAfter="true"
-        android:fromAlpha="0.7"
-        android:interpolator="@android:anim/accelerate_interpolator"
-        android:toAlpha="1.0" />
-    <translate
-        android:duration="500"
-        android:fillAfter="true"
-        android:fromYDelta="-100%"
-        android:interpolator="@android:anim/bounce_interpolator"
-        android:toYDelta="0%" />
-</set>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/CardViewStyle">
+
+    <TextView
+        android:id="@+id/todaysmenu_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:text="asdasd\nasdasd\nasdasd"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/black"
+        android:visibility="visible" />
+
+</android.support.v7.widget.CardView>

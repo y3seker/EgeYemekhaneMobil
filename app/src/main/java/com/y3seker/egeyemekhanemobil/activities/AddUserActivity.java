@@ -85,12 +85,12 @@ public class AddUserActivity extends RxAppCompatActivity {
         login();
     }
 
-    int caf = 0;
-    List<User> users;
-    User newUser;
-    SharedPreferences cookiesPrefs;
-    ProgressDialog progressDialog;
-    Subscription loginSubscription;
+    private int caf = 0;
+    private List<User> users;
+    private User newUser;
+    private SharedPreferences cookiesPrefs;
+    private ProgressDialog progressDialog;
+    private Subscription loginSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +191,7 @@ public class AddUserActivity extends RxAppCompatActivity {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
-    public boolean isValidateCredentials(String u, String p) {
+    private boolean isValidateCredentials(String u, String p) {
         boolean valid = true;
 
         if (u.isEmpty()) {
@@ -210,7 +210,7 @@ public class AddUserActivity extends RxAppCompatActivity {
         return valid;
     }
 
-    public boolean isUserExist(User u) {
+    private boolean isUserExist(User u) {
         if (users != null && users.size() != 0) {
             for (User user : users) {
                 if (user.getUniqeID() == u.getUniqeID())

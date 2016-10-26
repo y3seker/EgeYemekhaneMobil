@@ -33,7 +33,7 @@ import retrofit.Converter;
  * Created by floating @stackoverflow
  * -
  */
-public final class DocumentConverterFactory extends Converter.Factory {
+final class DocumentConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<ResponseBody, ?> fromResponseBody(Type type, Annotation[] annotations) {

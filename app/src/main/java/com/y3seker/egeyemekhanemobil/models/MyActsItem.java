@@ -27,8 +27,11 @@ import org.jsoup.select.Elements;
  */
 public class MyActsItem implements Parcelable {
 
-    public String date, time, caf, menu_type;
-    public String date_time;
+    private String date;
+    private String time;
+    public final String caf;
+    public final String menu_type;
+    public final String date_time;
 
     public MyActsItem(Elements elements) {
         this.date = elements.get(0).text();
@@ -44,7 +47,7 @@ public class MyActsItem implements Parcelable {
         this.caf = caf;
     }
 
-    protected MyActsItem(Parcel in) {
+    private MyActsItem(Parcel in) {
         date = in.readString();
         time = in.readString();
         caf = in.readString();

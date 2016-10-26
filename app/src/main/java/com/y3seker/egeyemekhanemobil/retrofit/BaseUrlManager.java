@@ -25,9 +25,9 @@ import retrofit.BaseUrl;
  * Created by Yunus Emre Şeker on 17.10.2015.
  * -
  */
-public class BaseUrlManager implements BaseUrl {
+class BaseUrlManager implements BaseUrl {
 
-    private String _url;
+    private final String _url;
     private HttpUrl url;
 
     public BaseUrlManager(String url) {

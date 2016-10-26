@@ -41,27 +41,4 @@ public class ReminderReceiver extends BroadcastReceiver {
         Utils.reminderNotification(context, false);
     }
 
-    public void notify(Context context) {
-        NotificationManager mNotificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Intent i = new Intent(context, LoginActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        String reminderText = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PrefConstants.REMINDER_TEXT, context.getString(R.string.next_week_reminder));
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_action_done)
-                        .setContentTitle(reminderText)
-                        .setAutoCancel(true)
-                        .setTicker(reminderText);
-
-        mBuilder.setDefaults(Notification.DEFAULT_ALL);
-        mBuilder.setContentIntent(pendingIntent);
-        mNotificationManager.notify(87878787, mBuilder.build());
-        Log.d("SERVICE", "Notify created!");
-    }
 }

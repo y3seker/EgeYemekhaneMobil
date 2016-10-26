@@ -40,7 +40,7 @@ import rx.schedulers.Schedulers;
  */
 public final class ConnectionUtils {
 
-    public static Observable<Object> forceLoginObservable(final User user) {
+    private static Observable<Object> forceLoginObservable(final User user) {
         RetrofitManager.setBaseUrl(user.getBaseUrl());
         return RetrofitManager.api().getLogin()
                 .flatMap(new Func1<Document, Observable<?>>() {
@@ -69,7 +69,7 @@ public final class ConnectionUtils {
     }
 
 
-    public static RequestBody getLoginRequestBody(User user) {
+    private static RequestBody getLoginRequestBody(User user) {
         HashMap<String, String> viewStates = user.getViewStates();
         return febWithViewStates(viewStates)
                 .add("txtKullaniciAdi", user.getUsername())

@@ -23,14 +23,18 @@ import com.y3seker.egeyemekhanemobil.utils.Utils;
  * -
  */
 public class OrderItem implements Comparable<OrderItem> {
-    public String text, name, dayNumber, menuUrl, menu;
+    public final String text;
+    public final String name;
+    public final String dayNumber;
+    public String menuUrl;
+    public String menu;
     public boolean isDisabled;
     public boolean isChecked;
     public boolean isInProgress;
     public boolean isOrderedBefore;
-    public String date;
+    private final String date;
 
-    public OrderItem(String text, String name, String date, boolean isDisabled, boolean isOrderedBefore) {
+    private OrderItem(String text, String name, String date, boolean isDisabled, boolean isOrderedBefore) {
         this.text = text;
         this.name = name;
         this.date = date;

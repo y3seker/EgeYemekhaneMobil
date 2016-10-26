@@ -36,6 +36,6 @@ public class UrlConstants {
     public static final String C_YEMEKLERIM = "/yemeklerim.aspx";
     public static final String C_HATA = "/hata.aspx";
 
-    public static final String C_OGLE_MENU = "/1732/OglenYemekMenusu.html";
-    public static final String C_AKSAM_MENU = "/1710/AksamYemekMenusu.html";
+    public static final String C_MENU = "/yemekliste.aspx?tarih=%s&ogun=%s";
+
 }

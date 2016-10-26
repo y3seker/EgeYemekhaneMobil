@@ -29,7 +29,7 @@ import rx.schedulers.Schedulers;
  * Created by Yunus Emre Şeker on 2.11.2015.
  * -
  */
-public final class MenuUtils {
+final class MenuUtils {
 
     public static Observable<Document> lunchObservable() {
         RetrofitManager.setBaseUrl(UrlConstants.MENU_BASE);

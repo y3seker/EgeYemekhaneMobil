@@ -20,7 +20,8 @@ package com.y3seker.egeyemekhanemobil.models;
  * Created by Yunus Emre Şeker on 24.10.2015.
  */
 public class CancelItem {
-    public String text, name;
+    public final String text;
+    public final String name;
     public boolean isChecked;
 
     public CancelItem(String text, String name) {

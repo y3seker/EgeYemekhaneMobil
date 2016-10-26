@@ -80,10 +80,10 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     @Bind(R.id.mymenus_rv)
     RecyclerView recyclerView;
 
-    ArrayList<MyMenusItem> myMenuz;
-    MenuRVAdapter rvAdapter;
-    Snackbar noResultSnackBar;
-    CoordinatorLayout.LayoutParams fabLP;
+    private ArrayList<MyMenusItem> myMenuz;
+    private MenuRVAdapter rvAdapter;
+    private Snackbar noResultSnackBar;
+    private CoordinatorLayout.LayoutParams fabLP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

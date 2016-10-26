@@ -36,7 +36,7 @@ import java.net.URL;
  * Created by Yunus Emre Şeker on 1.11.2015.
  * -
  */
-public class HandlerResponseInterceptor implements Interceptor {
+class HandlerResponseInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         URL url = chain.request().url();

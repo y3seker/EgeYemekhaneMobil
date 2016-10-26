@@ -58,14 +58,14 @@ public class MyActsActivity extends BaseActivity {
     @Bind(R.id.myacts_rv)
     RecyclerView recyclerView;
 
-    List<MyActsItem> actsHistory;
-    Elements pages = null;
-    int nextPage = 1;
-    MyActsRVAdapter rvAdapter;
+    private List<MyActsItem> actsHistory;
+    private Elements pages = null;
+    private int nextPage = 1;
+    private MyActsRVAdapter rvAdapter;
 
     private boolean isLoadingPageFailed = false;
 
-    View.OnClickListener clickListener = new View.OnClickListener() {
+    private final View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (!rvAdapter.isLoading()) {
@@ -157,7 +157,7 @@ public class MyActsActivity extends BaseActivity {
         toolbar.setTitle(doc.getElementById("bk1").text());
     }
 
-    public void loadPage(final int nextPage) {
+    private void loadPage(final int nextPage) {
         rvAdapter.showLoadingFooter(true);
         RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                 .add(ParseConstants.EVENT_ARG, "Page$" + nextPage)

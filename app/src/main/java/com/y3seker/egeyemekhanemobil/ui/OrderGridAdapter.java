@@ -40,15 +40,19 @@ import java.util.Random;
  */
 public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.OrderHolder> implements View.OnClickListener, View.OnLongClickListener {
 
-    Context mContext;
-    List<OrderItem> items;
-    int itemLayoutID;
-    int lastPosition = -1;
+    private final Context mContext;
+    private final List<OrderItem> items;
+    private final int itemLayoutID;
+    private int lastPosition = -1;
     // COLORS
-    int grey500, grey400, white, black, colorPrimary;
-    String[] days;
-    int daysLength;
-    OrderActivity.CheckerListener checkerListener;
+    private final int grey500;
+    private final int grey400;
+    private final int white;
+    private final int black;
+    private final int colorPrimary;
+    private final String[] days;
+    private final int daysLength;
+    private OrderActivity.CheckerListener checkerListener;
 
     public OrderGridAdapter(Context c, int itemLayoutID, List<OrderItem> items) {
         this.mContext = c;
@@ -183,15 +187,15 @@ public class OrderGridAdapter extends RecyclerView.Adapter<OrderGridAdapter.Orde
         notifyItemChanged(pos);
     }
 
-    public OrderItem getItem(int pos) {
+    private OrderItem getItem(int pos) {
         return items.get(pos - daysLength);
     }
 
 
     public class OrderHolder extends RecyclerView.ViewHolder {
 
-        TextView checker;
-        ProgressBar progress;
+        final TextView checker;
+        final ProgressBar progress;
 
         public OrderHolder(View itemView) {
             super(itemView);

@@ -31,7 +31,6 @@
         android:visibility="visible">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/main_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"

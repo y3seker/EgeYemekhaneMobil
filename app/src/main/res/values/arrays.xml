@@ -15,17 +15,7 @@
   -->
 
 <resources>
-    <string-array name="menu_types">
-        <item>@string/iftar_wp</item>
-        <item>@string/lunch_wp</item>
-        <item>@string/dinner_wp</item>
-    </string-array>
-    <string-array name="my_menu_types">
-        <item>Hepsi</item>
-        <item>@string/breakfast</item>
-        <item>@string/lunch</item>
-        <item>@string/dinner</item>
-    </string-array>
+
     <string-array name="cafs">
         <item>@string/caf0</item>
         <item>@string/caf1</item>

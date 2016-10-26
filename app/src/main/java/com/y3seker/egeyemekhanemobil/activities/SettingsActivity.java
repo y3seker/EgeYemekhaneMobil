@@ -48,8 +48,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Bind(R.id.settings_toolbar)
     Toolbar toolbar;
-    SharedPreferences appPrefs;
-    List<User> users;
+    private SharedPreferences appPrefs;
+    private List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

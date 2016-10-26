@@ -33,22 +33,23 @@ import java.util.ArrayList;
  */
 public class Database extends SQLiteOpenHelper {
 
-    public static final String USER_UNIQUEID = "Uniqueid";
-    public static final String USER_NAME = "Name";
-    public static final String USER_USERNAME = "Username";
-    public static final String USER_PASSWORD = "Password";
-    public static final String USER_CAFNUMBER = "Cafnumber";
+    private static final String USER_UNIQUEID = "Uniqueid";
+    private static final String USER_NAME = "Name";
+    private static final String USER_USERNAME = "Username";
+    private static final String USER_PASSWORD = "Password";
+    private static final String USER_CAFNUMBER = "Cafnumber";
 
-    public static final String[] ALL_USER_KEYS = new String[]{USER_UNIQUEID,
+    private static final String[] ALL_USER_KEYS = new String[]{USER_UNIQUEID,
             USER_NAME,
             USER_USERNAME,
             USER_PASSWORD,
             USER_CAFNUMBER};
 
-    public static final String TABLE_USER = "user_table";
+    private static final String TABLE_USER = "user_table";
+    private static final String TABLE_MENU = "menu_table";
 
-    public static final String DATABASE_NAME = "YEMEKHANEDB";
-    public static final int DATABASE_VERSION = 5;
+    private static final String DATABASE_NAME = "YEMEKHANEDB";
+    private static final int DATABASE_VERSION = 5;
 
     private static final String DB_CREATE_USER_TABLE =
             "create table " + TABLE_USER

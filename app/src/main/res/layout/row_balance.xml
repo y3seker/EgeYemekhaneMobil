@@ -21,7 +21,6 @@
     style="@style/CardViewStyle">
 
     <RelativeLayout
-        android:id="@+id/balance_row_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="2dp">

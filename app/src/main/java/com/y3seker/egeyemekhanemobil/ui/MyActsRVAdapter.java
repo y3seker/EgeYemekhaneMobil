@@ -38,15 +38,15 @@ import java.util.List;
  */
 public class MyActsRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<MyActsItem> items;
-    Context mContext;
-    int itemLayoutID;
-    int footerLayoutID;
-    int lastPosition = -1;
-    boolean hasPages;
-    boolean isLoading = false;
-    boolean isLoadingFailed = false;
-    View.OnClickListener moreButtonListener;
+    private final List<MyActsItem> items;
+    private final Context mContext;
+    private final int itemLayoutID;
+    private int footerLayoutID;
+    private int lastPosition = -1;
+    private boolean hasPages;
+    private boolean isLoading = false;
+    private boolean isLoadingFailed = false;
+    private View.OnClickListener moreButtonListener;
     private boolean footerRemoved = false;
 
     public MyActsRVAdapter(Context mContext, int itemLayoutID, List<MyActsItem> items) {
@@ -166,8 +166,10 @@ public class MyActsRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class MyActsHolder extends RecyclerView.ViewHolder {
-        TextView date, caf, menu_type;
-        CardView card;
+        final TextView date;
+        final TextView caf;
+        final TextView menu_type;
+        final CardView card;
 
         public MyActsHolder(View itemView) {
             super(itemView);
@@ -179,10 +181,10 @@ public class MyActsRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public class FooterHolder extends RecyclerView.ViewHolder {
-        TextView text;
-        TextView errorText;
-        ProgressBar loadingProgress;
-        CardView card;
+        final TextView text;
+        final TextView errorText;
+        final ProgressBar loadingProgress;
+        final CardView card;
 
         public FooterHolder(View itemView) {
             super(itemView);
