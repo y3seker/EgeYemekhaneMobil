@@ -1,4 +1,4 @@
-# EgeYemekhaneMobil
+# EgeYemekhaneMobil [![Build Status](https://travis-ci.org/y3seker/EgeYemekhaneMobil.svg?branch=master)](https://travis-ci.org/y3seker/EgeYemekhaneMobil)
 
 An unofficial Android app for Ege Uni. Cafeteria Systems
 
