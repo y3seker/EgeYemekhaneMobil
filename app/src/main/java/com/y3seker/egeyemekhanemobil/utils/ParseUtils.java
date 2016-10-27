@@ -59,7 +59,7 @@ public final class ParseUtils {
     }
 
     public static boolean isOrderWarningPage(Document doc) {
-        return doc.select("form").first().attr("action").equals("hata.aspx?no=1");
+        return doc.select("form").first().attr("action").equals("./hata.aspx?no=1");
     }
 
     public static boolean isLoginSucceed(Document doc) {
