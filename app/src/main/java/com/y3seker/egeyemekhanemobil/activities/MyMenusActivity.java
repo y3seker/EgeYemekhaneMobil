@@ -204,7 +204,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
             String[] dateFields = dateString.split("\\.");
             Calendar c = Calendar.getInstance();
             c.set(Integer.parseInt(dateFields[2]), Integer.parseInt(dateFields[1]) - 1, Integer.parseInt(dateFields[0]));
-            MyMenusItem mmi = Utils.findMyMenusItem(items,c);
+            MyMenusItem mmi = findMyMenusItem(items,c);
             if (mmi != null) {
                 mmi.setMeals(element.children().get(3).text());
             } else {
@@ -212,6 +212,14 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
             }
         }
         return items;
+    }
+
+    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c) {
+        for (MyMenusItem myMenusItem : list) {
+            if (Utils.isSameDay(myMenusItem.date, c))
+                return myMenusItem;
+        }
+        return null;
     }
 
     public static RequestBody getMyMenusRequestBody(HashMap<String, String> viewStates, Calendar from, Calendar to) {

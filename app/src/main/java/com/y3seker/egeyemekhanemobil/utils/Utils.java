@@ -33,12 +33,10 @@ import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.ReminderReceiver;
 import com.y3seker.egeyemekhanemobil.activities.LoginActivity;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
-import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -98,14 +96,9 @@ public final class Utils {
         return splitted[2] + "." + splitted[1] + "." + splitted[0];
     }
 
-    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c) {
-        for (MyMenusItem myMenusItem : list) {
-            if (myMenusItem.date.equals(c))
-                return myMenusItem;
-        }
-        return null;
+    public static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return !(cal1 == null || cal2 == null) && (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
     }
-
 
     private static void setupReminder(Context context) throws NumberFormatException {
         AlarmManager manager = (AlarmManager) context.getSystemService(Activity.ALARM_SERVICE);
