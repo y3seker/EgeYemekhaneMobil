@@ -86,7 +86,7 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends RxAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = MainActivity.class.getSimpleName();
     private static final int LOGGED_IN = 1;
     private static final int LOGGED_OUT = 2;
     private static final int LOGIN_FAILED = 3;
@@ -232,6 +232,7 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private void addMenuCard(final String menuType) {
+        final int menuIndex = menuType.equals("O") ? 1 : 2;
         final String date = Utils.orderDateFormat.format(Utils.today.getTime());
         final String url = currentUser.getBaseUrl() +
                 String.format(UrlConstants.C_MENU, date, menuType);
@@ -249,6 +250,7 @@ public class MainActivity extends RxAppCompatActivity
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "addMenuCard failed for " + url);
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -265,8 +267,9 @@ public class MainActivity extends RxAppCompatActivity
                                 menu += menuRow.text() + "\n";
                             }
                         }
-                        cardList.add(menu.trim());
-                        mainRVAdapter.notifyItemInserted(cardList.size() - 1);
+                        int insertIndex = menuIndex < cardList.size() ? menuIndex : cardList.size();
+                        cardList.add(insertIndex, menu.trim());
+                        mainRVAdapter.notifyItemInserted(insertIndex);
                     }
                 });
     }
@@ -336,7 +339,7 @@ public class MainActivity extends RxAppCompatActivity
             else {
                 updateNavigationView(LOGGED_IN);
                 if (userMenus.containsKey(currentUser)) {
-                    cardList.add(0,userMenus.get(currentUser));
+                    cardList.add(0, userMenus.get(currentUser));
                     mainRVAdapter.notifyItemChanged(0);
                 } else {
                     getUserInfo();
