@@ -37,11 +37,10 @@ import java.util.List;
  */
 public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<MyMenusItem> items;
     private final int itemLayoutID;
-
     private final int grey;
     private final int accent;
+    private List<MyMenusItem> items;
 
     public MenuRVAdapter(Context c, int itemLayoutID, List<MyMenusItem> items) {
         this.itemLayoutID = itemLayoutID;
@@ -64,13 +63,13 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(itemLayoutID, parent, false);
-        return new Menu_Holder(v);
+        return new MyMenusHolder(v);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof Menu_Holder) {
-            Menu_Holder holder1 = (Menu_Holder) holder;
+        if (holder instanceof MyMenusHolder) {
+            MyMenusHolder holder1 = (MyMenusHolder) holder;
             MyMenusItem myMenusItem = items.get(position);
             holder1.date.setText(Utils.myMenusDateStringFormat.format(myMenusItem.date.getTime()));
 
@@ -78,6 +77,7 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder1.lunch.setTextColor(myMenusItem.lunch ? accent : grey);
             holder1.breakfast.setTextColor(myMenusItem.breakfast ? accent : grey);
             holder1.iftar.setTextColor(myMenusItem.iftar ? accent : grey);
+            holder1.iftar.setVisibility(myMenusItem.iftar ? View.VISIBLE : View.GONE);
 
             /*
             // Toogles the visibility of menus
@@ -94,7 +94,7 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return items.size();
     }
 
-    private static class Menu_Holder extends RecyclerView.ViewHolder {
+    public static class MyMenusHolder extends RecyclerView.ViewHolder {
         final TextView date;
         final TextView breakfast;
         final TextView lunch;
@@ -102,7 +102,7 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         final TextView iftar;
         final CardView card;
 
-        Menu_Holder(View itemView) {
+        MyMenusHolder(View itemView) {
             super(itemView);
             this.date = (TextView) itemView.findViewById(R.id.mymenus_row_date);
             this.iftar = (TextView) itemView.findViewById(R.id.mymenus_row_iftar);

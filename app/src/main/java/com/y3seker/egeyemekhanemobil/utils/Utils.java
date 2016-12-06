@@ -49,14 +49,15 @@ import java.util.TimeZone;
  */
 public final class Utils {
 
-    private static final String TAG = Utils.class.getSimpleName();
-    private static final SimpleDateFormat myMenusDateFormat;
     public static final SimpleDateFormat myMenusDateStringFormat;
-    private static final SimpleDateFormat myMenusReverseDateFormat;
     public static final SimpleDateFormat orderDateFormat;
     public static final SimpleDateFormat balanceDateFormat;
     public static final DecimalFormat twoDigit;
     public static final Calendar today;
+
+    private static final String TAG = Utils.class.getSimpleName();
+    private static final SimpleDateFormat myMenusDateFormat;
+    private static final SimpleDateFormat myMenusReverseDateFormat;
     private static final TimeZone trTimeZone;
     private static final Locale trLocale;
 
@@ -66,7 +67,7 @@ public final class Utils {
         twoDigit = new DecimalFormat("00");
         today = Calendar.getInstance(trTimeZone);
         myMenusDateFormat = new SimpleDateFormat("MM.dd.yyyy", trLocale);
-        myMenusDateStringFormat = new SimpleDateFormat("EE, dd.MM.yyyy", trLocale);
+        myMenusDateStringFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy", trLocale);
         myMenusReverseDateFormat = new SimpleDateFormat("yyyy.MM.dd", trLocale);
         balanceDateFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss", trLocale);
         orderDateFormat = new SimpleDateFormat("MM.dd.yyyy", trLocale);

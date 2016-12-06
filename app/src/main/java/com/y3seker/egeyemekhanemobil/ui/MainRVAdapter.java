@@ -30,6 +30,7 @@ import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.BalanceItem;
 import com.y3seker.egeyemekhanemobil.models.MyActsItem;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
+import com.y3seker.egeyemekhanemobil.ui.MenuRVAdapter.MyMenusHolder;
 
 import java.util.List;
 
@@ -96,10 +97,13 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (holder instanceof MyMenusHolder) {
             MyMenusHolder holder1 = (MyMenusHolder) holder;
             MyMenusItem myMenusItem = (MyMenusItem) list.get(position);
-            holder1.text.setText(myMenusItem.dateString);
+            holder1.date.setText(myMenusItem.dateString);
             holder1.dinner.setTextColor(myMenusItem.dinner ? accent : grey);
             holder1.lunch.setTextColor(myMenusItem.lunch ? accent : grey);
             holder1.breakfast.setTextColor(myMenusItem.breakfast ? accent : grey);
+            holder1.iftar.setTextColor(myMenusItem.iftar ? accent : grey);
+            holder1.iftar.setVisibility(myMenusItem.iftar ? View.VISIBLE : View.GONE);
+
         } else if (holder instanceof TodaysMenuHolder) {
             TodaysMenuHolder holder1 = (TodaysMenuHolder) holder;
             String menu = (String) list.get(position);
@@ -112,21 +116,6 @@ public class MainRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return list.size();
     }
 
-    public class MyMenusHolder extends RecyclerView.ViewHolder {
-
-        public final TextView text;
-        public final TextView breakfast;
-        public final TextView lunch;
-        public final TextView dinner;
-
-        public MyMenusHolder(View itemView) {
-            super(itemView);
-            this.text = (TextView) itemView.findViewById(R.id.mymenus_row_date);
-            this.lunch = (TextView) itemView.findViewById(R.id.mymenus_row_lunch);
-            this.dinner = (TextView) itemView.findViewById(R.id.mymenus_row_dinner);
-            this.breakfast = (TextView) itemView.findViewById(R.id.mymenus_row_breakfast);
-        }
-    }
 
     public class TodaysMenuHolder extends RecyclerView.ViewHolder {
 
