@@ -23,9 +23,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -47,19 +45,16 @@ import android.widget.Toast;
 
 import com.trello.rxlifecycle.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-import com.y3seker.egeyemekhanemobil.Database;
 import com.y3seker.egeyemekhanemobil.R;
+import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.constants.RequestCodes;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
 import com.y3seker.egeyemekhanemobil.ui.MainRVAdapter;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
@@ -67,8 +62,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,11 +80,6 @@ public class MainActivity extends RxAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    private static final int LOGGED_IN = 1;
-    private static final int LOGGED_OUT = 2;
-    private static final int LOGIN_FAILED = 3;
-    private static final int NO_USER = 4;
-    private static final int USER_DELETED = 5;
     @Bind(R.id.main_appbar)
     AppBarLayout appBarLayout;
     @Bind(R.id.toolbar)
@@ -100,24 +88,17 @@ public class MainActivity extends RxAppCompatActivity
     ImageView mainImage;
     @Bind(R.id.main_rv)
     RecyclerView mainRV;
+    Menu menu;
+    MainRVAdapter mainRVAdapter;
+    List<Object> cardList;
+    Map<User, MyMenusItem> userMenus = new HashMap<>();
+    ProgressDialog progressDialog;
+    List<MenuItem> userMenuItems = new ArrayList<>();
     private NavigationView navigationView;
-    private DrawerLayout drawer;
-    private Menu menu;
     private TextView navHeaderName;
     private TextView navHeaderUsername;
-    private MainRVAdapter mainRVAdapter;
-    private List<Object> cardList;
-    private List<MenuItem> menuItems;
-    private List<User> users;
-    private Map<User, MyMenusItem> userMenus;
     private Subscription userInfoSub;
-    private User currentUser;
-    private Database database;
-    private ProgressDialog progressDialog;
-    private SharedPreferences cookiesPrefs;
     private SharedPreferences appPrefs;
-    @SignState
-    private int LOGIN_STATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,18 +106,10 @@ public class MainActivity extends RxAppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // setup toolbar
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        menuItems = new ArrayList<>();
-        userMenus = new HashMap<>();
-        database = new Database(this);
-        cookiesPrefs = this.getSharedPreferences(PrefConstants.COOKIE_STORE_PREF, MODE_PRIVATE);
         appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        users = getIntent().getParcelableArrayListExtra("users");
-        if (users == null)
-            users = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
@@ -149,24 +122,14 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private void setupUsers() {
-        if (users.size() == 0) {
-            updateNavigationView(NO_USER);
-            return;
+        if (UserManager.getInstance().hasUser()) {
+            for (User user : UserManager.getInstance().getUsers()) {
+                MenuItem menuItem = menu.add(menu.findItem(R.id.nav_add_acc).getGroupId(), user.hashCode(), Menu.NONE, user.getMenuLabel())
+                        .setIcon(user.isLoggedIn() ? R.drawable.ic_action_label : R.drawable.ic_action_label_outline);
+                userMenuItems.add(menuItem);
+            }
         }
-        User defaultUser = null;
-        long defUser = appPrefs.getLong(PrefConstants.DEFAULT_USER, 0);
-        for (User user : users) {
-            menu.add(menu.findItem(R.id.nav_add_acc).getGroupId(), user.hashCode(), Menu.NONE, user.getMenuLabel())
-                    .setIcon(R.drawable.ic_action_label_outline);
-            if (user.isLoggedIn())
-                setCurrentUser(user);
-            if (user.getUniqeID() == defUser)
-                defaultUser = user;
-        }
-
-        if (getIntent().getAction().equals(LoginActivity.LOGIN_FAILED_ACTION)) {
-            setCurrentUser(defaultUser != null ? defaultUser : users.get(0));
-        }
+        updateNavigationView();
     }
 
     private void setupCards() {
@@ -174,15 +137,15 @@ public class MainActivity extends RxAppCompatActivity
         mainRV.setLayoutManager(new LinearLayoutManager(this));
         mainRVAdapter = new MainRVAdapter(this, cardList);
         mainRV.setAdapter(mainRVAdapter);
-        if (currentUser != null) {
-            addMenuCard("O");
-            addMenuCard("A");
-        }
+        addMenuCard("O");
+        addMenuCard("A");
     }
 
+    // FIXME
     private void getUserInfo() {
         if (userInfoSub != null && !userInfoSub.isUnsubscribed())
             userInfoSub.unsubscribe();
+        final User currentUser = UserManager.getInstance().getCurrentUser();
         userInfoSub = RetrofitManager.api().getMyMenus()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
@@ -212,7 +175,6 @@ public class MainActivity extends RxAppCompatActivity
 
                     @Override
                     public void onNext(Document document) {
-
                         ArrayList<MyMenusItem> menusItems = MyMenusActivity.parseMenus(document);
                         if (menusItems != null) {
                             for (MyMenusItem menusItem : menusItems) {
@@ -232,6 +194,7 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private void addMenuCard(final String menuType) {
+        User currentUser = UserManager.getInstance().getCurrentUser();
         final int menuIndex = menuType.equals("O") ? 1 : 2;
         final String date = Utils.orderDateFormat.format(Utils.today.getTime());
         final String url = currentUser.getBaseUrl() +
@@ -275,7 +238,7 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private void setupDrawer() {
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -293,17 +256,13 @@ public class MainActivity extends RxAppCompatActivity
         navHeaderName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LOGIN_STATE == LOGGED_IN)
-                    toggleMenuAccounts();
+                toggleMenuAccounts();
             }
         });
         navigationView.setNavigationItemSelectedListener(this);
-        for (int i = 0; i < menu.size(); i++) {
-            menuItems.add(menu.getItem(i));
-        }
     }
 
-    private void toggleMenuAccounts() {
+    void toggleMenuAccounts() {
         boolean isExpanded = menu.findItem(R.id.nav_add_acc).isVisible();
         if (Build.VERSION.SDK_INT == 17)
             navHeaderName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
@@ -314,45 +273,35 @@ public class MainActivity extends RxAppCompatActivity
         menu.setGroupVisible(R.id.nav_group_nologin, !isExpanded);
     }
 
-    private void addNewUser(User newUser) {
-        users.add(newUser);
-        database.insertUser(newUser);
-        menu.add(menu.findItem(R.id.nav_add_acc).getGroupId(), newUser.hashCode(), Menu.NONE, newUser.getMenuLabel())
+    private void onNewUser() {
+        User currentUser = UserManager.getInstance().getCurrentUser();
+        MenuItem menuItem = menu.add(menu.findItem(R.id.nav_add_acc).getGroupId(), currentUser.hashCode(), Menu.NONE, currentUser.getMenuLabel())
                 .setIcon(R.drawable.ic_action_label_outline);
-        setCurrentUser(newUser);
+        userMenuItems.add(menuItem);
+        updateNavigationView();
     }
 
-    private void setCurrentUser(User user) {
-        User prevUser = currentUser;
-        if (prevUser != null && menu.findItem(prevUser.hashCode()) != null) {
-            Log.d(TAG, "user changed, prevUser: " + prevUser.getName());
-            menu.findItem(prevUser.hashCode()).setIcon(R.drawable.ic_action_label_outline);
-            if (cardList.contains(userMenus.get(prevUser)))
-                cardList.remove(0);
+    void updateNavigationView() {
+        // Reset login badges
+        for (MenuItem userMenuItem : userMenuItems) {
+            userMenuItem.setIcon(R.drawable.ic_action_label_outline);
         }
-        currentUser = user;
 
+        // If we have no user
+        if (!UserManager.getInstance().hasUser()) {
+            navHeaderName.setText(R.string.add_account_to_use);
+            navHeaderUsername.setText("");
+            navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            menu.setGroupVisible(R.id.nav_group_login, false);
+            menu.setGroupVisible(R.id.nav_group_nologin, true);
+            return;
+        }
+
+        User currentUser = UserManager.getInstance().getCurrentUser();
         if (currentUser != null) {
-            mainImage.setImageResource(currentUser.getCafeteriaNumber() != 2 ? R.drawable.ege1_t : R.drawable.ege2_t);
-            if (!currentUser.isLoggedIn())
-                login(currentUser);
-            else {
-                updateNavigationView(LOGGED_IN);
-                if (userMenus.containsKey(currentUser)) {
-                    cardList.add(0, userMenus.get(currentUser));
-                    mainRVAdapter.notifyItemChanged(0);
-                } else {
-                    getUserInfo();
-                }
-            }
-        }
-
-    }
-
-    private void updateNavigationView(final int state) {
-        LOGIN_STATE = state;
-        switch (state) {
-            case LOGGED_IN:
+            mainImage.setImageResource(currentUser.getCafeteriaNumber() == 1 ? R.drawable.ege1_t : R.drawable.ege2_t);
+            // If we have current user
+            if (currentUser.isLoggedIn()) {
                 navHeaderName.setText(currentUser.getName());
                 navHeaderUsername.setText(currentUser.getUsername());
                 menu.findItem(currentUser.hashCode()).setIcon(R.drawable.ic_action_label);
@@ -360,80 +309,49 @@ public class MainActivity extends RxAppCompatActivity
                 menu.setGroupVisible(R.id.nav_group_login, true);
                 menu.setGroupVisible(R.id.nav_group_nologin, false);
                 toggleMenuAccounts();
-                break;
-            case LOGGED_OUT:
-            case LOGIN_FAILED:
-                navHeaderName.setText(R.string.pls_login);
-                navHeaderUsername.setText("");
-                menu.setGroupVisible(R.id.nav_group_login, false);
-                menu.setGroupVisible(R.id.nav_group_nologin, true);
-                navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-                break;
-            case NO_USER:
-                navHeaderName.setText(R.string.add_account_to_use);
-                navHeaderUsername.setText("");
-                navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-                menu.setGroupVisible(R.id.nav_group_login, false);
-                menu.setGroupVisible(R.id.nav_group_nologin, true);
-                break;
-            case USER_DELETED:
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    private void afterLoginUpdateUI(final boolean isLoginSucceed) {
-        progressDialog.dismiss();
-        if (isLoginSucceed) {
-            currentUser.setIsLoggedIn(true);
-            updateNavigationView(LOGGED_IN);
-            setCurrentUser(currentUser);
-            makeSnackBar(String.format(getString(R.string.logged_in_as), currentUser.getName())).show();
+            }
         } else {
-            currentUser.setIsLoggedIn(false);
-            updateNavigationView(LOGGED_OUT);
+            navHeaderName.setText(R.string.pls_login); // :(
+            navHeaderUsername.setText("");
+            navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            menu.setGroupVisible(R.id.nav_group_login, false);
+            menu.setGroupVisible(R.id.nav_group_nologin, true);
         }
     }
 
-    private void login(final User currentUser) {
+    void login(final User user) {
         progressDialog.setMessage(getString(R.string.logging_in));
         progressDialog.show();
-        ConnectionUtils.loginObservable(currentUser)
-                .compose(this.bindToLifecycle())
-                .cast(Document.class)
-                .subscribe(new Subscriber<Document>() {
-                    @Override
-                    public void onCompleted() {
+        UserManager.getInstance().login(user, this, new Subscriber<Document>() {
+            @Override
+            public void onCompleted() {
+                progressDialog.dismiss();
+            }
 
-                    }
+            @Override
+            public void onError(Throwable e) {
+                progressDialog.dismiss();
+                updateNavigationView();
+                makeSnackBar(getString(R.string.connection_error)).setDuration(Snackbar.LENGTH_LONG)
+                        .setAction(R.string.try_again, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                login(user);
+                            }
+                        }).show();
+                e.printStackTrace();
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        afterLoginUpdateUI(false);
-                        makeSnackBar(getString(R.string.connection_error)).setDuration(Snackbar.LENGTH_LONG)
-                                .setAction(R.string.try_again, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        login(currentUser);
-                                    }
-                                }).show();
-                    }
-
-                    @Override
-                    public void onNext(Document document) {
-                        currentUser.setCookie(RetrofitManager.getCookie());
-                        cookiesPrefs.edit()
-                                .putString(currentUser.getCookieKey(), new SerializableHttpCookie().encode(currentUser.getCookie()))
-                                .apply();
-                        afterLoginUpdateUI(true);
-                    }
-                });
+            @Override
+            public void onNext(Document document) {
+                updateNavigationView();
+                makeSnackBar(String.format(getString(R.string.logged_in_as),
+                        UserManager.getInstance().getCurrentUser().getName())).show();
+            }
+        });
     }
 
-    private Snackbar makeSnackBar(String message) {
+    Snackbar makeSnackBar(String message) {
         return Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
     }
 
@@ -448,37 +366,17 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     @Override
-    protected void onStop() {
-        database.close();
-        super.onStop();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case RequestCodes.LOGIN_REQ_CODE:
                 if (resultCode == RESULT_OK) {
-                    User user = data.getParcelableExtra(ParseConstants.USER);
-                    addNewUser(user);
-                    navigationView.getMenu().setGroupVisible(R.id.nav_group_login, true);
-                    navigationView.getMenu().setGroupVisible(R.id.nav_group_nologin, false);
+                    onNewUser();
                 }
                 break;
             case RequestCodes.BASE_REQ_CODE:
-                if (resultCode == RESULT_OK) {
-                    User user = data.getParcelableExtra(ParseConstants.USER);
-                    if (!currentUser.getCookie().getValue().equals(user.getCookie().getValue())) {
-                        currentUser.setCookie(user.getCookie());
-                        cookiesPrefs.edit()
-                                .putString(currentUser.getCookieKey(),
-                                        new SerializableHttpCookie().encode(currentUser.getCookie()))
-                                .apply();
-                    }
-                }
                 break;
             case RequestCodes.SETTINGS_REQ_CODE:
-
                 break;
             default:
                 break;
@@ -492,34 +390,37 @@ public class MainActivity extends RxAppCompatActivity
         findNavItemPosition(item, clickPos);
         switch (id) {
             case R.id.nav_add_acc:
-                startActivityFR(users, AddUserActivity.class, RequestCodes.LOGIN_REQ_CODE);
+                startActivityFR(AddUserActivity.class, RequestCodes.LOGIN_REQ_CODE, clickPos);
                 break;
 
             case R.id.nav_balance:
-                startActivityFR(currentUser, BalanceActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
+                startActivityFR(BalanceActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
                 break;
 
             case R.id.nav_my_menus:
-                startActivityFR(currentUser, MyMenusActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
+                startActivityFR(MyMenusActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
                 break;
 
             case R.id.nav_menu_order:
-                startActivityFR(currentUser, OrderActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
+                startActivityFR(OrderActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
                 break;
 
             case R.id.nav_menu_cancel:
-                startActivityFR(currentUser, CancelActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
+                startActivityFR(CancelActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
                 break;
 
             case R.id.nav_caf_history:
-                startActivityFR(currentUser, MyActsActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
+                startActivityFR(MyActsActivity.class, RequestCodes.BASE_REQ_CODE, clickPos);
                 break;
+
             case R.id.nav_settings:
-                startActivityFR(users, SettingsActivity.class, RequestCodes.SETTINGS_REQ_CODE);
+                startActivityFR(SettingsActivity.class, RequestCodes.SETTINGS_REQ_CODE, clickPos);
                 break;
+
             case R.id.nav_about:
-                startActivityFR(currentUser, AboutActivity.class, RequestCodes.SETTINGS_REQ_CODE, clickPos);
+                startActivityFR(AboutActivity.class, RequestCodes.SETTINGS_REQ_CODE, clickPos);
                 break;
+
             case R.id.nav_feedback:
                 Intent send = new Intent(Intent.ACTION_SENDTO);
                 String uriText = "mailto:" + Uri.encode("y3seker@gmail.com") +
@@ -535,22 +436,10 @@ public class MainActivity extends RxAppCompatActivity
                 }
                 break;
             default:
-                User selected = null;
-                for (User user : users) {
-                    if (user.hashCode() == id)
-                        selected = user;
-                }
-                if (selected != null) {
-                    // Clicked on other user
-                    if (!selected.equals(currentUser))
-                        setCurrentUser(selected);
-                    else {
-                        // Clicked on current user
-                        if (currentUser.isLoggedIn())
-                            showLoggedUserDialog().show();
-                        else
-                            login(currentUser);
-                    }
+                if (UserManager.getInstance().getCurrentUser().hashCode() == id)
+                    showLoggedUserDialog().show();
+                else {
+                    login(UserManager.getInstance().getUserByHashcode(id));
                 }
                 break;
         }
@@ -569,47 +458,31 @@ public class MainActivity extends RxAppCompatActivity
             v.getLocationOnScreen(pos);
     }
 
-    private void startActivityFR(User user, Class cls, int code, int[] clickPos) {
+    private void startActivityFR(Class cls, int code, int[] clickPos) {
         Intent i = new Intent(getApplicationContext(), cls);
-        i.putExtra(ParseConstants.USER, user);
         i.putExtra(OtherConstants.REVEAL_POSITION, clickPos);
         startActivityForResult(i, code);
     }
 
-    private void startActivityFR(List<User> users, Class cls, int code) {
-        Intent l = new Intent(getApplicationContext(), cls);
-        l.setAction(LoginActivity.ADD_USER_ACTION);
-        l.putParcelableArrayListExtra(ParseConstants.USERS, (ArrayList<? extends Parcelable>) users);
-        startActivityForResult(l, code);
-    }
-
     private AlertDialog.Builder showLoggedUserDialog() {
+        final User currentUser = UserManager.getInstance().getCurrentUser();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.user_info)
                 .setMessage(currentUser.toString())
                 .setNeutralButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (database.deleteUser(currentUser.getUniqeID())) {
+                        if (UserManager.getInstance().deleteCurrentUser()) {
                             makeSnackBar(getString(R.string.user_deleted) + currentUser.getMenuLabel());
-                            users.remove(currentUser);
+                            MenuItem menuItem = menu.findItem(currentUser.hashCode());
+                            userMenuItems.remove(menuItem);
                             menu.removeItem(currentUser.hashCode());
-                            if (users.size() == 0) {
-                                updateNavigationView(NO_USER);
-                                setCurrentUser(null);
-                            } else {
-                                setCurrentUser(users.get(0));
-                            }
+                            updateNavigationView();
                         }
                     }
                 })
                 .setPositiveButton(R.string.close, null)
                 .create();
         return builder;
-    }
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOGGED_IN, LOGGED_OUT, LOGIN_FAILED, NO_USER, USER_DELETED})
-    public @interface SignState {
     }
 }

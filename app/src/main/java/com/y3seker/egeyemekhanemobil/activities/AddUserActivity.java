@@ -18,10 +18,7 @@ package com.y3seker.egeyemekhanemobil.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -32,18 +29,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.y3seker.egeyemekhanemobil.InvalidCredentialException;
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
-import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
+import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 
 import org.jsoup.nodes.Document;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -74,6 +66,9 @@ public class AddUserActivity extends RxAppCompatActivity {
     AppCompatSpinner cafSpinner;
     @Bind(R.id.addnewuser_cancel)
     TextView cancelText;
+    ProgressDialog progressDialog;
+    User newUser;
+    Subscription loginSubscription;
 
     @OnClick(R.id.addnewuser_cancel)
     public void addnewuser_cancel() {
@@ -85,23 +80,14 @@ public class AddUserActivity extends RxAppCompatActivity {
         login();
     }
 
-    private int caf = 0;
-    private List<User> users;
-    private User newUser;
-    private SharedPreferences cookiesPrefs;
-    private ProgressDialog progressDialog;
-    private Subscription loginSubscription;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addnewuser);
         ButterKnife.bind(this);
         newUser = new User();
-        cookiesPrefs = this.getSharedPreferences(PrefConstants.COOKIE_STORE_PREF, MODE_PRIVATE);
         cafSpinner.setSelection(1, true);
         RetrofitManager.removeCookies();
-        users = getIntent().getParcelableArrayListExtra(ParseConstants.USERS);
         password.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
@@ -117,17 +103,18 @@ public class AddUserActivity extends RxAppCompatActivity {
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                loginSubscription.unsubscribe();
+                if (loginSubscription != null)
+                    loginSubscription.unsubscribe();
             }
         });
     }
 
-    private void login() {
-        caf = cafSpinner.getSelectedItemPosition();
+    void login() {
+        int caf = cafSpinner.getSelectedItemPosition();
         String u = username.getText().toString();
         String p = password.getText().toString();
 
-        if (!isValidateCredentials(u, p)) {
+        if (!validateCredentials(u, p)) {
             onLoginFailed(getString(R.string.wrong_info));
             return;
         }
@@ -136,62 +123,46 @@ public class AddUserActivity extends RxAppCompatActivity {
         newUser.setPassword(p);
         newUser.setCafeteriaNumber(caf);
 
-        if (isUserExist(newUser)) {
+        if (UserManager.getInstance().isUserExist(newUser)) {
             onLoginFailed(getString(R.string.user_already_exist));
-            return;
-        }
+        } else {
+            progressDialog.show();
+            UserManager.getInstance().addUser(newUser).setCurrentUser(newUser);
+            loginSubscription = UserManager.getInstance().login(this, new Subscriber<Document>() {
+                @Override
+                public void onCompleted() {
+                    progressDialog.dismiss();
+                }
 
-        progressDialog.show();
-        loginSubscription = ConnectionUtils.loginObservable(newUser)
-                .compose(this.bindToLifecycle())
-                .cast(Document.class)
-                .subscribe(new Subscriber<Document>() {
-                    @Override
-                    public void onCompleted() {
-                        progressDialog.dismiss();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        progressDialog.dismiss();
+                @Override
+                public void onError(Throwable e) {
+                    progressDialog.dismiss();
+                    if (e instanceof InvalidCredentialException) {
+                        onLoginFailed(getString(R.string.wrong_info));
+                    } else {
                         onLoginFailed(getString(R.string.connection_error));
-                        e.printStackTrace();
                     }
+                    e.printStackTrace();
+                }
 
-                    @Override
-                    public void onNext(Document document) {
-                        if (!ParseUtils.isLoginPage(document)) {
-                            newUser.setViewStates(ParseUtils.extractViewState(document));
-                            newUser.setIsLoggedIn(true);
-                            newUser.setName(ParseUtils.getUserName(document));
-                            newUser.setCookie(RetrofitManager.getCookie());
-                            cookiesPrefs.edit()
-                                    .putString(newUser.getCookieKey(),new SerializableHttpCookie().encode(newUser.getCookie()))
-                                    .apply();
-                            if (users.size() == 0)
-                                PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit()
-                                        .putLong(PrefConstants.DEFAULT_USER, newUser.getUniqeID()).apply();
-                            onLoginSucceed(newUser);
-                        } else {
-                            onLoginFailed(getString(R.string.wrong_info));
-                        }
-                    }
-                });
-
+                @Override
+                public void onNext(Document document) {
+                    onLoginSucceed();
+                }
+            });
+        }
     }
 
-    private void onLoginSucceed(User user) {
-        Intent data = new Intent();
-        data.putExtra(ParseConstants.USER, user);
-        setResult(RESULT_OK, data);
+    void onLoginSucceed() {
+        setResult(RESULT_OK);
         finish();
     }
 
-    private void onLoginFailed(String message) {
+    void onLoginFailed(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
     }
 
-    private boolean isValidateCredentials(String u, String p) {
+    private boolean validateCredentials(String u, String p) {
         boolean valid = true;
 
         if (u.isEmpty()) {
@@ -210,21 +181,9 @@ public class AddUserActivity extends RxAppCompatActivity {
         return valid;
     }
 
-    private boolean isUserExist(User u) {
-        if (users != null && users.size() != 0) {
-            for (User user : users) {
-                if (user.getUniqeID() == u.getUniqeID())
-                    return true;
-            }
-            return false;
-        } else
-            return false;
-    }
-
     @Override
     public void onBackPressed() {
         setResult(RESULT_CANCELED);
         finish();
     }
-
 }

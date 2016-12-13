@@ -16,17 +16,13 @@
 
 package com.y3seker.egeyemekhanemobil;
 
-import android.app.Application;
-
 /**
- * Created by Yunus Emre Şeker on 13.10.2015.
+ * Created by Yunus on 13.12.2016.
  * -
  */
-public class ThisApplication extends Application {
+public class InvalidCredentialException extends Throwable {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        UserManager.getInstance().init(this);
+    public InvalidCredentialException(String message) {
+        super(message);
     }
 }

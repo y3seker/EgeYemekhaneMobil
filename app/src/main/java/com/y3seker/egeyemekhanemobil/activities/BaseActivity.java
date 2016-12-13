@@ -18,7 +18,6 @@ package com.y3seker.egeyemekhanemobil.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -32,23 +31,18 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 
-import com.squareup.okhttp.Call;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.R;
+import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.constants.OtherConstants;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
 import com.y3seker.egeyemekhanemobil.utils.AnimUtils;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.nodes.Document;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -61,23 +55,19 @@ import rx.schedulers.Schedulers;
  */
 public class BaseActivity extends RxAppCompatActivity {
 
-    private static final String TAG = BaseActivity.class.getSimpleName();
-
-    private int[] revealPos;
+    static final String TAG = BaseActivity.class.getSimpleName();
     User user;
-    private View rootView;
-    private ProgressDialog progressDialog;
     ProgressBar progressBar;
-    private Menu menu;
-    private Map<String, Call> calls;
+    ProgressDialog progressDialog;
+    private int[] revealPos;
+    private View rootView;
     private boolean isClosing = false;
     private boolean isSavedState, isRestart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        calls = new HashMap<>();
-        user = getIntent().getParcelableExtra(ParseConstants.USER);
+        user = UserManager.getInstance().getCurrentUser();
         revealPos = getIntent().getIntArrayExtra(OtherConstants.REVEAL_POSITION);
         if (user == null)
             throw new NullPointerException("User is null");
@@ -164,7 +154,6 @@ public class BaseActivity extends RxAppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
-        this.menu = menu;
         if (user != null) {
             int icon = 0;
             if (user.getCafeteriaNumber() == 0)
@@ -200,9 +189,7 @@ public class BaseActivity extends RxAppCompatActivity {
         if (isClosing)
             return;
         isClosing = true;
-        Intent i = new Intent();
-        i.putExtra(ParseConstants.USER, user);
-        setResult(RESULT_OK, i);
+        setResult(RESULT_OK);
 
         // bottom center of window
         //revealPos[0] = rootView.getWidth() / 2;
@@ -224,7 +211,7 @@ public class BaseActivity extends RxAppCompatActivity {
                 .show();
     }
 
-    private void onException(Exception e) {
+    void onException(Exception e) {
         String errorMessage = e.getMessage() != null ? getString(R.string.error_message) + e.getMessage() : "";
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.error))
@@ -262,34 +249,29 @@ public class BaseActivity extends RxAppCompatActivity {
         };
     }
 
-    private void login(final User currentUser) {
+    void login(final User currentUser) {
         progressDialog.setMessage(getString(R.string.logging_in));
         progressDialog.show();
         progressDialog.setCancelable(false);
-        ConnectionUtils.loginObservable(currentUser)
-                .compose(this.bindToLifecycle())
-                .cast(Document.class)
-                .subscribe(new Subscriber<Document>() {
-                    @Override
-                    public void onCompleted() {
-                        //progressDialog.setCancelable(true);
-                        progressDialog.dismiss();
-                    }
+        UserManager.getInstance().login(this, new Subscriber<Document>() {
+            @Override
+            public void onCompleted() {
+                progressDialog.dismiss();
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        //progressDialog.setCancelable(true);
-                        progressDialog.dismiss();
-                        onException(((Exception) e));
-                    }
+            @Override
+            public void onError(Throwable e) {
+                progressDialog.dismiss();
+                onException((Exception) e);
+                e.printStackTrace();
+            }
 
-                    @Override
-                    public void onNext(Document document) {
-                        currentUser.setCookie(RetrofitManager.getCookie());
-                        restart();
-                    }
-                });
+            @Override
+            public void onNext(Document document) {
+                restart();
+
+            }
+        });
     }
 
     public void showOrderFailedDialog() {
@@ -311,6 +293,12 @@ public class BaseActivity extends RxAppCompatActivity {
                 })
                 .create()
                 .show();
+    }
+
+    public interface HandlerCallback {
+        void onException(Throwable e);
+
+        void onDone(Document doc);
     }
 
     public class HandlerSubscriber extends Subscriber<Document> implements HandlerCallback {
@@ -349,11 +337,5 @@ public class BaseActivity extends RxAppCompatActivity {
         public void onDone(Document doc) {
 
         }
-    }
-
-    public interface HandlerCallback {
-        void onException(Throwable e);
-
-        void onDone(Document doc);
     }
 }
