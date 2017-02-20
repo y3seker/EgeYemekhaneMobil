@@ -85,14 +85,18 @@ public class UserManager {
 
     public Subscription login(int id, RxAppCompatActivity context, final Subscriber<Document> caller) {
         User selectedUser = getUserByHashcode(id);
-        if (selectedUser == null)
-            throw new IllegalStateException("User has not found with id:" + id);
+        if (selectedUser == null) {
+            caller.onError(new IllegalStateException("User has not found with id:" + id));
+            return null;
+        }
         return login(selectedUser, context, caller);
     }
 
     public Subscription login(RxAppCompatActivity context, final Subscriber<Document> caller) {
-        if (currentUser == null)
-            throw new IllegalStateException("No user found!");
+        if (currentUser == null) {
+            caller.onError(new IllegalStateException("No user found!"));
+            return null;
+        }
         return login(currentUser, context, caller);
     }
 
@@ -103,7 +107,7 @@ public class UserManager {
             caller.onCompleted();
             return null;
         }
-        
+
         return ConnectionUtils.loginObservable(user)
                 .compose(context.bindToLifecycle())
                 .cast(Document.class)
@@ -120,22 +124,25 @@ public class UserManager {
 
                     @Override
                     public void onNext(Document document) {
-                        if (!ParseUtils.isLoginPage(document))
+                        if (ParseUtils.isLoginPage(document))
                             onError(new InvalidCredentialException("Credentials invalid for user: " + user.getUniqeID()));
-
-                        HttpCookie cookie = RetrofitManager.getCookie();
-                        cookiesPrefs.edit()
-                                .putString(user.getCookieKey(), new SerializableHttpCookie().encode(cookie))
-                                .apply();
-                        user.setViewStates(ParseUtils.extractViewState(document));
-                        if (user.getName().isEmpty()) {
-                            user.setName(ParseUtils.getUserName(document));
-                            database.updateUser(user);
+                        else {
+                            HttpCookie cookie = RetrofitManager.getCookie();
+                            if (cookie != null) {
+                                cookiesPrefs.edit()
+                                        .putString(user.getCookieKey(), new SerializableHttpCookie().encode(cookie))
+                                        .apply();
+                            }
+                            user.setViewStates(ParseUtils.extractViewState(document));
+                            if (user.getName().isEmpty()) {
+                                user.setName(ParseUtils.getUserName(document));
+                                database.updateUser(user);
+                            }
+                            user.setCookie(cookie);
+                            user.setIsLoggedIn(true);
+                            currentUser = user;
+                            caller.onNext(document);
                         }
-                        user.setCookie(cookie);
-                        user.setIsLoggedIn(true);
-                        currentUser = user;
-                        caller.onNext(document);
                     }
                 });
     }

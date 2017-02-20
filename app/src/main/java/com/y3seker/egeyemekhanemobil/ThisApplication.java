@@ -29,4 +29,10 @@ public class ThisApplication extends Application {
         super.onCreate();
         UserManager.getInstance().init(this);
     }
+
+    @Override
+    public void onTerminate() {
+        UserManager.getInstance().destroy();
+        super.onTerminate();
+    }
 }

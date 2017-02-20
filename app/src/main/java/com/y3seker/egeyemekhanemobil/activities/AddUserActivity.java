@@ -127,8 +127,8 @@ public class AddUserActivity extends RxAppCompatActivity {
             onLoginFailed(getString(R.string.user_already_exist));
         } else {
             progressDialog.show();
-            UserManager.getInstance().addUser(newUser).setCurrentUser(newUser);
-            loginSubscription = UserManager.getInstance().login(this, new Subscriber<Document>() {
+
+            loginSubscription = UserManager.getInstance().login(newUser, this, new Subscriber<Document>() {
                 @Override
                 public void onCompleted() {
                     progressDialog.dismiss();
@@ -154,6 +154,7 @@ public class AddUserActivity extends RxAppCompatActivity {
     }
 
     void onLoginSucceed() {
+        UserManager.getInstance().addUser(newUser).setCurrentUser(newUser);
         setResult(RESULT_OK);
         finish();
     }

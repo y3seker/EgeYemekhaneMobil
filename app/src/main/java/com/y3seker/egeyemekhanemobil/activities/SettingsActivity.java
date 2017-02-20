@@ -30,7 +30,7 @@ import android.view.MenuItem;
 import android.widget.TimePicker;
 
 import com.y3seker.egeyemekhanemobil.R;
-import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
+import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
@@ -49,7 +49,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Bind(R.id.settings_toolbar)
     Toolbar toolbar;
     private SharedPreferences appPrefs;
-    private List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +56,12 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
         appPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        users = getIntent().getParcelableArrayListExtra(ParseConstants.USERS);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle(R.string.settings);
         SettingsFragment settingsFragment = new SettingsFragment();
-        settingsFragment.setUsers(users);
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_fragment_root, settingsFragment).commit();
     }
 
@@ -95,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle bundle, String s) {
             addPreferencesFromResource(R.xml.settings);
             appPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            users = UserManager.getInstance().getUsers();
         }
 
         @Override
