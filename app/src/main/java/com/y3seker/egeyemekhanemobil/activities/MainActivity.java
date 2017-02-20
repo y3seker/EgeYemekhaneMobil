@@ -137,15 +137,17 @@ public class MainActivity extends RxAppCompatActivity
         mainRV.setLayoutManager(new LinearLayoutManager(this));
         mainRVAdapter = new MainRVAdapter(this, cardList);
         mainRV.setAdapter(mainRVAdapter);
+        getUserInfo();
         addMenuCard("O");
         addMenuCard("A");
     }
 
-    // FIXME
+    // TODO: Get ride of this
     private void getUserInfo() {
         if (userInfoSub != null && !userInfoSub.isUnsubscribed())
             userInfoSub.unsubscribe();
         final User currentUser = UserManager.getInstance().getCurrentUser();
+        if (currentUser == null) return;
         userInfoSub = RetrofitManager.api().getMyMenus()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
@@ -176,30 +178,42 @@ public class MainActivity extends RxAppCompatActivity
                     @Override
                     public void onNext(Document document) {
                         ArrayList<MyMenusItem> menusItems = MyMenusActivity.parseMenus(document);
-                        if (menusItems != null) {
-                            for (MyMenusItem menusItem : menusItems) {
-                                menusItem.dateString = getString(R.string.mymenus_today);
-                                userMenus.put(currentUser, menusItem);
-                                cardList.add(0, menusItem);
-                                mainRVAdapter.notifyItemInserted(0);
-                            }
+                        if (menusItems != null && !menusItems.isEmpty()) {
+                            MyMenusItem menusItem = menusItems.get(0);
+                            menusItem.dateString = getString(R.string.mymenus_today);
+                            userMenus.put(currentUser, menusItem);
+                            cardList.add(0, menusItem);
+                            mainRVAdapter.notifyDataSetChanged();
                         } else {
                             MyMenusItem noMenu = new MyMenusItem(getString(R.string.mymenus_today));
                             userMenus.put(currentUser, noMenu);
                             cardList.add(0, noMenu);
-                            mainRVAdapter.notifyItemInserted(0);
+                            mainRVAdapter.notifyDataSetChanged();
                         }
                     }
                 });
     }
 
+    private void updateUserInfoCard() {
+        if (!cardList.isEmpty() && cardList.get(0) instanceof MyMenusItem)
+            cardList.remove(0);
+        MyMenusItem myMenusItem = userMenus.get(UserManager.getInstance().getCurrentUser());
+        if (myMenusItem == null)
+            getUserInfo();
+        else {
+            cardList.add(0, myMenusItem);
+            mainRVAdapter.notifyDataSetChanged();
+        }
+    }
+
+    // TODO: Get ride of this
     private void addMenuCard(final String menuType) {
         User currentUser = UserManager.getInstance().getCurrentUser();
-        final int menuIndex = menuType.equals("O") ? 1 : 2;
         final String date = Utils.orderDateFormat.format(Utils.today.getTime());
         final String url = currentUser.getBaseUrl() +
                 String.format(UrlConstants.C_MENU, date, menuType);
         RetrofitManager.api().getRequest(url)
+                .retry(2)
                 .compose(this.bindUntilEvent(ActivityEvent.STOP))
                 .cast(Document.class)
                 .subscribeOn(Schedulers.io())
@@ -230,9 +244,15 @@ public class MainActivity extends RxAppCompatActivity
                                 menu += menuRow.text() + "\n";
                             }
                         }
-                        int insertIndex = menuIndex < cardList.size() ? menuIndex : cardList.size();
-                        cardList.add(insertIndex, menu.trim());
-                        mainRVAdapter.notifyItemInserted(insertIndex);
+                        if (menuType.equals("O")) {
+                            if (!cardList.isEmpty() && cardList.get(0) instanceof MyMenusItem)
+                                cardList.add(1, menu.trim());
+                            else
+                                cardList.add(0, menu.trim());
+                        } else {
+                            cardList.add(menu.trim());
+                        }
+                        mainRVAdapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -347,6 +367,7 @@ public class MainActivity extends RxAppCompatActivity
                 updateNavigationView();
                 makeSnackBar(String.format(getString(R.string.logged_in_as),
                         UserManager.getInstance().getCurrentUser().getName())).show();
+                updateUserInfoCard();
             }
         });
     }
@@ -439,7 +460,14 @@ public class MainActivity extends RxAppCompatActivity
                 if (UserManager.getInstance().getCurrentUser().hashCode() == id)
                     showLoggedUserDialog().show();
                 else {
-                    login(UserManager.getInstance().getUserByHashcode(id));
+                    User selectedUser = UserManager.getInstance().getUserByHashcode(id);
+                    if (!selectedUser.isLoggedIn())
+                        login(selectedUser);
+                    else {
+                        UserManager.getInstance().setCurrentUser(selectedUser);
+                        updateNavigationView();
+                        updateUserInfoCard();
+                    }
                 }
                 break;
         }
