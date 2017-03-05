@@ -91,7 +91,7 @@ public class BalanceActivity extends BaseActivity {
 
     private void getBalancesPage() {
         showProgressBar();
-        RetrofitManager.api().getBalance().cache()
+        RetrofitManager.service().getBalance().cache()
                 .retry(2)
                 .compose(this.bindUntilEvent(ActivityEvent.STOP))
                 .compose(applySchedulers())
@@ -154,11 +154,11 @@ public class BalanceActivity extends BaseActivity {
 
     private void loadPage(final int nextPage) {
         rvAdapter.showLoadingFooter(true);
-        FormBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+        FormBody requestBody = new FormBody.Builder()
                 .add(ParseConstants.EVENT_ARG, "Page$" + nextPage)
                 .add(ParseConstants.EVENT_TARGET, "ctl00$ContentPlaceHolder1$GridView1")
                 .build();
-        RetrofitManager.api().postBalance(requestBody)
+        RetrofitManager.service().postBalance(requestBody)
                 .retry(1)
                 .compose(this.bindToLifecycle())
                 .compose(applySchedulers())

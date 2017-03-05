@@ -72,9 +72,6 @@ public class BaseActivity extends RxAppCompatActivity {
         if (user == null)
             throw new NullPointerException("User is null");
         RetrofitManager.setBaseUrl(user.getBaseUrl());
-        if (user.getCookie() != null) {
-            RetrofitManager.addCookie(user.getCookie());
-        }
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         isSavedState = savedInstanceState != null;
@@ -253,7 +250,7 @@ public class BaseActivity extends RxAppCompatActivity {
         progressDialog.setMessage(getString(R.string.logging_in));
         progressDialog.show();
         progressDialog.setCancelable(false);
-        UserManager.getInstance().login(this, new Subscriber<Document>() {
+        UserManager.getInstance().login(this, new Subscriber<User>() {
             @Override
             public void onCompleted() {
                 progressDialog.dismiss();
@@ -267,9 +264,8 @@ public class BaseActivity extends RxAppCompatActivity {
             }
 
             @Override
-            public void onNext(Document document) {
+            public void onNext(User user) {
                 restart();
-
             }
         });
     }
@@ -324,7 +320,6 @@ public class BaseActivity extends RxAppCompatActivity {
 
         @Override
         public void onNext(Document document) {
-            ParseUtils.extractViewState(user.getViewStates(), document);
             onDone(document);
         }
 

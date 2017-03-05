@@ -42,15 +42,14 @@ public final class ConnectionUtils {
 
     private static Observable<Object> forceLoginObservable(final User user) {
         //RetrofitManager.setBaseUrl(user.getBaseUrl());
-        return RetrofitManager.api().getLogin()
+        return RetrofitManager.service().getLogin()
                 .flatMap(new Func1<Document, Observable<?>>() {
 
                     @Override
                     public Observable<?> call(Document document) {
-                        ParseUtils.extractViewState(user.getViewStates(), document);
                         RequestBody requestBody = getLoginRequestBody(user);
                         Log.e("loginObservable", "Login posting for " + user.getUsername());
-                        return RetrofitManager.api().postLogin(requestBody);
+                        return RetrofitManager.service().postLogin(requestBody);
                     }
                 })
                 .retry(1)
@@ -62,7 +61,7 @@ public final class ConnectionUtils {
         //RetrofitManager.setBaseUrl(user.getBaseUrl());
         //RetrofitManager.addCookie(user.getCookie());
         return forceLoginObservable(user).cast(Document.class);
-//        return RetrofitManager.api().getHome()
+//        return RetrofitManager.service().getHome()
 //                .retry(1)
 //                .onErrorResumeNext(ConnectionUtils.forceLoginObservable(user).cast(Document.class))
 //                .subscribeOn(Schedulers.io())
@@ -71,8 +70,7 @@ public final class ConnectionUtils {
 
 
     private static RequestBody getLoginRequestBody(User user) {
-        HashMap<String, String> viewStates = user.getViewStates();
-        return febWithViewStates(viewStates)
+        return new FormBody.Builder()
                 .add("txtKullaniciAdi", user.getUsername())
                 .add("txtParola", user.getPassword())
                 .add("grs", user.getCafeteriaNumber() == 0 ? "rPersonel" : "rOgrenci")

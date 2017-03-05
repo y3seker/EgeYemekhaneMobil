@@ -22,12 +22,7 @@ import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.y3seker.egeyemekhanemobil.ThisApplication;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
-
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.HttpCookie;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -46,23 +41,15 @@ public class RetrofitManager {
     private ConnectionService service;
     private ClearableCookieJar cookieJar;
 
-    public static RetrofitManager instance(){
+    public static RetrofitManager instance() {
         return mInstance;
     }
 
-    public static ConnectionService api() {
+    public static ConnectionService service() {
         return instance().getApi();
     }
 
     public static void setBaseUrl(String url) {
-        //setup(url);
-    }
-
-    public static void addCookie(HttpCookie cookie) {
-    }
-
-    public static HttpCookie getCookie() {
-        return null;
     }
 
     public void init(Context context) {

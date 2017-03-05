@@ -18,14 +18,14 @@ package com.y3seker.egeyemekhanemobil.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.constants.RequestCodes;
-
-import org.jsoup.nodes.Document;
+import com.y3seker.egeyemekhanemobil.models.User;
 
 import rx.Subscriber;
 
@@ -39,11 +39,13 @@ public class LoginActivity extends RxAppCompatActivity {
     public static final String LOGIN_FAILED_ACTION = "login_failed";
     private static final String LOGIN_SUCCEED_ACTION = "login_succeed";
     private static final String TAG = LoginActivity.class.getSimpleName();
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UserManager.getInstance().login(this, new Subscriber<Document>() {
+        rootView = findViewById(android.R.id.content);
+        UserManager.getInstance().login(this, new Subscriber<User>() {
             @Override
             public void onCompleted() {
             }
@@ -55,10 +57,11 @@ public class LoginActivity extends RxAppCompatActivity {
                 } else {
                     startActivity(LOGIN_FAILED_ACTION);
                 }
+                e.printStackTrace();
             }
 
             @Override
-            public void onNext(Document document) {
+            public void onNext(User user) {
                 startActivity(LOGIN_SUCCEED_ACTION);
             }
         });
@@ -83,9 +86,16 @@ public class LoginActivity extends RxAppCompatActivity {
         if (requestCode == RequestCodes.LOGIN_REQ_CODE) {
             if (resultCode == RESULT_OK) {
                 startActivity(LOGIN_SUCCEED_ACTION);
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, R.string.add_account_to_use, Toast.LENGTH_SHORT).show();
-                //finish();
+            } else if (resultCode == RESULT_CANCELED && !UserManager.getInstance().hasUser()) {
+                final Snackbar snackbar = Snackbar.make(rootView, R.string.add_account_to_use, Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction(R.string.add_account, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startAddUserActivity();
+                        snackbar.dismiss();
+                    }
+                });
+                snackbar.show();
             }
         }
     }

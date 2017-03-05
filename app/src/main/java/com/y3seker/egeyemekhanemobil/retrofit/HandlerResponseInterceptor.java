@@ -16,7 +16,9 @@
 
 package com.y3seker.egeyemekhanemobil.retrofit;
 
+import com.y3seker.egeyemekhanemobil.InvalidCredentialException;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
+import com.y3seker.egeyemekhanemobil.localapi.parsers.LoginParser;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.OrderSessionException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.RequestBlockedException;
@@ -29,44 +31,85 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.Buffer;
 
 /**
  * Created by Yunus Emre Şeker on 1.11.2015.
  * -
  */
 class HandlerResponseInterceptor implements Interceptor {
-    private Map<String, String> lastViewStates = new HashMap<>();
+    private Map<String, String> url2ViewStates = new HashMap<>();
+
+    private static String bodyToString(final RequestBody request) {
+        try {
+            final RequestBody copy = request;
+            final Buffer buffer = new Buffer();
+            if (copy != null)
+                copy.writeTo(buffer);
+            else
+                return "";
+            return buffer.readUtf8();
+        } catch (final IOException e) {
+            return "";
+        }
+    }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
         HttpUrl url = chain.request().url();
-        Response response = chain.proceed(chain.request());
+        Request request = chain.request();
+        MediaType urlencodedType = MediaType.parse("application/x-www-form-urlencoded;charset=UTF-8");
+        if (request.method().equals("POST") && !url2ViewStates.isEmpty()) {
+            String viewStates = url2ViewStates.get(url.toString());
+            String bodyToString = bodyToString(request.body());
+            RequestBody requestBody = RequestBody.create(urlencodedType,
+                    bodyToString + (bodyToString.length() > 0 ? "&" : "") + viewStates);
+            request = request.newBuilder()
+                    .post(requestBody)
+                    .build();
+        }
+
+        Response response = chain.proceed(request);
         MediaType contentType = response.body().contentType();
         String body = response.body().string();
-        Document document = Jsoup.parse(body);
+        Document responseDoc = Jsoup.parse(body);
         response.body().close();
+
+        try {
+            storeViewStates(url, responseDoc);
+        } catch (NullPointerException ignored) {
+        }
+
         if (!response.isSuccessful())
             throw new IOException();
-
-        if (ParseUtils.isBlockedPaged(document))
+        if (ParseUtils.isBlockedPaged(responseDoc))
             throw new RequestBlockedException();
-        else if (!url.encodedPath().equals(UrlConstants.C_DEFAULT) && ParseUtils.isLoginPage(document))
+        if (!url.encodedPath().equals(UrlConstants.C_DEFAULT) && LoginParser.isLoginPage(responseDoc))
             throw new NonLoginException();
-        else if (ParseUtils.isOrderWarningPage(document))
+        if (LoginParser.isCredentialsInvalid(responseDoc))
+            throw new InvalidCredentialException();
+        if (ParseUtils.isOrderWarningPage(responseDoc))
             throw new OrderSessionException();
 
         return response.newBuilder().body(ResponseBody.create(contentType, body)).build();
     }
 
-    private void handleViewStates(Chain chain) {
-        if (chain.request().method().equals("POST") && !lastViewStates.isEmpty()) {
-            RequestBody body = chain.request().body();
-        }
+    private void storeViewStates(HttpUrl url, Document responseDoc) {
+        HashMap<String, String> viewStates = ParseUtils.extractViewState(responseDoc);
+        FormBody.Builder builder1 = new FormBody.Builder();
+        if (viewStates != null && !viewStates.isEmpty())
+            for (Map.Entry<String, String> entry : viewStates.entrySet()) {
+                builder1.add(entry.getKey(), entry.getValue());
+            }
+        String viewStatesString = bodyToString(builder1.build());
+        url2ViewStates.put(url.toString(), viewStatesString);
     }
 }

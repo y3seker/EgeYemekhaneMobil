@@ -16,13 +16,19 @@
 
 package com.y3seker.egeyemekhanemobil;
 
+import java.io.IOException;
+
 /**
  * Created by Yunus on 13.12.2016.
  * -
  */
-public class InvalidCredentialException extends Throwable {
+public class InvalidCredentialException extends IOException {
 
     public InvalidCredentialException(String message) {
         super(message);
+    }
+
+    public InvalidCredentialException() {
+        super();
     }
 }

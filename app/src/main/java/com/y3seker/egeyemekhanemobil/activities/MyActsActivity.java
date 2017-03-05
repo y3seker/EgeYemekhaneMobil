@@ -28,7 +28,6 @@ import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.MyActsItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.ui.MyActsRVAdapter;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -50,14 +50,11 @@ import rx.schedulers.Schedulers;
 public class MyActsActivity extends BaseActivity {
 
     private static final String TAG = MyActsActivity.class.getSimpleName();
-
-    private boolean hasPages = false;
-
     @BindView(R.id.myacts_toolbar)
     Toolbar toolbar;
     @BindView(R.id.myacts_rv)
     RecyclerView recyclerView;
-
+    private boolean hasPages = false;
     private List<MyActsItem> actsHistory;
     private Elements pages = null;
     private int nextPage = 1;
@@ -94,7 +91,7 @@ public class MyActsActivity extends BaseActivity {
 
     private void getActsPage() {
         showProgressBar();
-        RetrofitManager.api().getMyHistory().cache()
+        RetrofitManager.service().getMyHistory().cache()
                 .retry(2)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -159,11 +156,11 @@ public class MyActsActivity extends BaseActivity {
 
     private void loadPage(final int nextPage) {
         rvAdapter.showLoadingFooter(true);
-        RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+        RequestBody requestBody = new FormBody.Builder()
                 .add(ParseConstants.EVENT_ARG, "Page$" + nextPage)
                 .add(ParseConstants.EVENT_TARGET, "ctl00$ContentPlaceHolder1$GridView1")
                 .build();
-        RetrofitManager.api().postMyHistory(requestBody)
+        RetrofitManager.service().postMyHistory(requestBody)
                 .retry(1)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)

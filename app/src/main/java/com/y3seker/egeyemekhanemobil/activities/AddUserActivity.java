@@ -33,9 +33,6 @@ import com.y3seker.egeyemekhanemobil.InvalidCredentialException;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.UserManager;
 import com.y3seker.egeyemekhanemobil.models.User;
-import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-
-import org.jsoup.nodes.Document;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,8 +123,7 @@ public class AddUserActivity extends RxAppCompatActivity {
             onLoginFailed(getString(R.string.user_already_exist));
         } else {
             progressDialog.show();
-
-            loginSubscription = UserManager.getInstance().login(newUser, this, new Subscriber<Document>() {
+            loginSubscription = UserManager.getInstance().login(newUser, this, new Subscriber<User>() {
                 @Override
                 public void onCompleted() {
                     progressDialog.dismiss();
@@ -136,16 +132,16 @@ public class AddUserActivity extends RxAppCompatActivity {
                 @Override
                 public void onError(Throwable e) {
                     progressDialog.dismiss();
+                    e.printStackTrace();
                     if (e instanceof InvalidCredentialException) {
                         onLoginFailed(getString(R.string.wrong_info));
                     } else {
                         onLoginFailed(getString(R.string.connection_error));
                     }
-                    e.printStackTrace();
                 }
 
                 @Override
-                public void onNext(Document document) {
+                public void onNext(User user) {
                     onLoginSucceed();
                 }
             });
@@ -153,7 +149,6 @@ public class AddUserActivity extends RxAppCompatActivity {
     }
 
     void onLoginSucceed() {
-        UserManager.getInstance().addUser(newUser).setCurrentUser(newUser);
         setResult(RESULT_OK);
         finish();
     }
@@ -164,7 +159,6 @@ public class AddUserActivity extends RxAppCompatActivity {
 
     private boolean validateCredentials(String u, String p) {
         boolean valid = true;
-
         if (u.isEmpty()) {
             valid = false;
             usernameWrapper.setError(getString(R.string.cant_be_empty));
@@ -177,12 +171,13 @@ public class AddUserActivity extends RxAppCompatActivity {
         } else {
             passwordWrapper.setErrorEnabled(false);
         }
-
         return valid;
     }
 
     @Override
     public void onBackPressed() {
+        if (loginSubscription != null)
+            loginSubscription.unsubscribe();
         setResult(RESULT_CANCELED);
         finish();
     }

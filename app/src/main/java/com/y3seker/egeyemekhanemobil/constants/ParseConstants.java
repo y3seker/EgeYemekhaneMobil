@@ -46,4 +46,5 @@ public class ParseConstants {
     public final static String NEXT = "İleri";
     public final static String ON = "on";
     public final static String VERIFIED = "onaylandibilgi";
+    public static final String INVALID_CREDENTIAL = "lblMesaj";
 }

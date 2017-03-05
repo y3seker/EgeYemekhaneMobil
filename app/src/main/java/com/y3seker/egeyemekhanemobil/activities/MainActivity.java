@@ -88,6 +88,7 @@ public class MainActivity extends RxAppCompatActivity
     ImageView mainImage;
     @BindView(R.id.main_rv)
     RecyclerView mainRV;
+    DrawerLayout drawer;
     Menu menu;
     MainRVAdapter mainRVAdapter;
     List<Object> cardList;
@@ -149,14 +150,12 @@ public class MainActivity extends RxAppCompatActivity
             userInfoSub.unsubscribe();
         final User currentUser = UserManager.getInstance().getCurrentUser();
         if (currentUser == null) return;
-        userInfoSub = RetrofitManager.api().getMyMenus()
+        userInfoSub = RetrofitManager.service().getMyMenus()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
                     public Observable<?> call(Document document) {
-                        ParseUtils.extractViewState(currentUser.getViewStates(), document);
-                        return RetrofitManager.api()
-                                .postMyMenus(MyMenusActivity.getMyMenusRequestBody(currentUser.getViewStates(),
-                                        Utils.today, Utils.today));
+                        return RetrofitManager.service()
+                                .postMyMenus(MyMenusActivity.getMyMenusRequestBody(Utils.today, Utils.today));
                     }
                 })
                 .retry(2)
@@ -213,7 +212,7 @@ public class MainActivity extends RxAppCompatActivity
         final String date = Utils.orderDateFormat.format(Utils.today.getTime());
         final String url = currentUser.getBaseUrl() +
                 String.format(UrlConstants.C_MENU, date, menuType);
-        RetrofitManager.api().getRequest(url)
+        RetrofitManager.service().getRequest(url)
                 .retry(2)
                 .compose(this.bindUntilEvent(ActivityEvent.STOP))
                 .cast(Document.class)
@@ -259,7 +258,7 @@ public class MainActivity extends RxAppCompatActivity
     }
 
     private void setupDrawer() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -315,6 +314,7 @@ public class MainActivity extends RxAppCompatActivity
             navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             menu.setGroupVisible(R.id.nav_group_login, false);
             menu.setGroupVisible(R.id.nav_group_nologin, true);
+            drawer.openDrawer(GravityCompat.START);
             return;
         }
 
@@ -337,13 +337,14 @@ public class MainActivity extends RxAppCompatActivity
             navHeaderName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             menu.setGroupVisible(R.id.nav_group_login, false);
             menu.setGroupVisible(R.id.nav_group_nologin, true);
+            drawer.openDrawer(GravityCompat.START);
         }
     }
 
     void login(final User user) {
         progressDialog.setMessage(getString(R.string.logging_in));
         progressDialog.show();
-        UserManager.getInstance().login(user, this, new Subscriber<Document>() {
+        UserManager.getInstance().login(user, this, new Subscriber<User>() {
             @Override
             public void onCompleted() {
                 progressDialog.dismiss();
@@ -364,7 +365,7 @@ public class MainActivity extends RxAppCompatActivity
             }
 
             @Override
-            public void onNext(Document document) {
+            public void onNext(User user) {
                 updateNavigationView();
                 makeSnackBar(String.format(getString(R.string.logged_in_as),
                         UserManager.getInstance().getCurrentUser().getName())).show();
@@ -458,7 +459,8 @@ public class MainActivity extends RxAppCompatActivity
                 }
                 break;
             default:
-                if (UserManager.getInstance().getCurrentUser().hashCode() == id)
+                if (UserManager.getInstance().getCurrentUser().hashCode() == id &&
+                        UserManager.getInstance().getCurrentUser().isLoggedIn())
                     showLoggedUserDialog().show();
                 else {
                     User selectedUser = UserManager.getInstance().getUserByHashcode(id);

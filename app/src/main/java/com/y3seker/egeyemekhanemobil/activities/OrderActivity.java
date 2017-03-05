@@ -42,8 +42,6 @@ import com.y3seker.egeyemekhanemobil.retrofit.exceptions.OrderSessionException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.RequestBlockedException;
 import com.y3seker.egeyemekhanemobil.ui.OrderGridAdapter;
 import com.y3seker.egeyemekhanemobil.ui.WrappableGridLayoutManager;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -80,15 +78,6 @@ import static com.y3seker.egeyemekhanemobil.constants.ParseConstants.YETERSIZ_BA
 public class OrderActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = OrderActivity.class.getSimpleName();
-
-    private List<OrderItem> orderItems;
-    private List<String> spinnerValues;
-    private List<String> spinnerLabels;
-    private ArrayAdapter<String> aa;
-    private OrderGridAdapter rvAdapter;
-    private boolean inProgress = false;
-    private CoordinatorLayout.LayoutParams fabLP;
-
     @BindView(R.id.root_layout)
     CoordinatorLayout coLayout;
     @BindView(R.id.order_appbar)
@@ -109,7 +98,13 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     View cardDivider;
     @BindView(R.id.order_rv)
     RecyclerView recyclerView;
-
+    private List<OrderItem> orderItems;
+    private List<String> spinnerValues;
+    private List<String> spinnerLabels;
+    private ArrayAdapter<String> aa;
+    private OrderGridAdapter rvAdapter;
+    private boolean inProgress = false;
+    private CoordinatorLayout.LayoutParams fabLP;
     private CompositeSubscription postSubs;
     private Subscription firstPageSub;
     private List<Subscription> subs;
@@ -163,7 +158,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
             return;
         }
 
-        RetrofitManager.api().getRequest(item.menuUrl)
+        RetrofitManager.service().getRequest(item.menuUrl)
                 .compose(this.bindUntilEvent(ActivityEvent.STOP))
                 .cast(Document.class)
                 .subscribeOn(Schedulers.io())
@@ -203,7 +198,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         dismissSnackbar();
         showProgressBar();
         unsubscribeAll();
-        firstPageSub = RetrofitManager.api().getOrder().cache()
+        firstPageSub = RetrofitManager.service().getOrder().cache()
                 .flatMap(new Func1<Document, Observable<?>>() {
                     @Override
                     public Observable<?> call(Document document) {
@@ -215,13 +210,12 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                                     input.attr("id") + "\"]").text());
                             spinnerValues.add(input.attr("value"));
                         }
-                        user.setViewStates(ParseUtils.extractViewState((document)));
-                        FormBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+                        FormBody requestBody = new FormBody.Builder()
                                 .add("ctl00$ContentPlaceHolder1$Button1", "İleri")
                                 .add("ctl00$ContentPlaceHolder1$osec",
                                         spinnerValues.isEmpty() ? "RadioButton2" : spinnerValues.get(menuType))
                                 .build();
-                        return RetrofitManager.api().postOrder(requestBody);
+                        return RetrofitManager.service().postOrder(requestBody);
                     }
                 })
                 .retry(2)
@@ -296,7 +290,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void postItem(String name, final int pos) {
         hideFab();
-        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = new FormBody.Builder();
         boolean hasCheckedItem = false;
         for (OrderItem orderItem : orderItems) {
             if (orderItem.isChecked) {
@@ -307,7 +301,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         final boolean finalHasCheckItem = hasCheckedItem;
         FormBody formBody = feb.add(EVENT_TARGET, name)
                 .add(EVENT_ARG, "").build();
-        Subscription sub = RetrofitManager.api().postOrder(formBody)
+        Subscription sub = RetrofitManager.service().postOrder(formBody)
                 .retry(1)
                 .compose(this.bindUntilEvent(ActivityEvent.STOP))
                 .cast(Document.class)
@@ -337,7 +331,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void postTheOrder() {
         showProgressDialog("Sipariş işleniyor");
-        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = new FormBody.Builder();
         for (OrderItem orderItem : orderItems) {
             if (orderItem.isChecked) {
                 feb.add(orderItem.name, "on");
@@ -348,7 +342,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                 .add(EVENT_ARG, "")
                 .add("ctl00$ContentPlaceHolder1$Button3", NEXT)
                 .build();
-        RetrofitManager.api().postOrder(postOrderBody)
+        RetrofitManager.service().postOrder(postOrderBody)
                 .retry(1)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -405,7 +399,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void cancelTheOrder() {
         showProgressDialog(getString(R.string.canceling_order));
-        RetrofitManager.api().getOrder()
+        RetrofitManager.service().getOrder()
                 .retry(3)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -431,11 +425,11 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void verifyTheOrder() {
         showProgressDialog(getString(R.string.verifing_order));
-        FormBody verifyOrderBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+        FormBody verifyOrderBody = new FormBody.Builder()
                 .add(EVENT_TARGET, "ctl00$ContentPlaceHolder1$Button6")
                 .add(EVENT_ARG, "")
                 .build();
-        RetrofitManager.api().postOrder(verifyOrderBody)
+        RetrofitManager.service().postOrder(verifyOrderBody)
                 .retry(1)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -552,13 +546,11 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     }
 
     private void hideFab() {
-        fabLP.setAnchorId(View.NO_ID);
         fab.setVisibility(View.GONE);
         fab.setLayoutParams(fabLP);
     }
 
     private void showFab() {
-        fabLP.setAnchorId(coLayout.getId());
         fab.setLayoutParams(fabLP);
         fab.show();
     }

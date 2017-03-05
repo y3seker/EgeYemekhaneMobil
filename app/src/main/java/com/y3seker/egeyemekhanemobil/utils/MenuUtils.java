@@ -33,7 +33,7 @@ final class MenuUtils {
 
     public static Observable<Document> lunchObservable() {
         RetrofitManager.setBaseUrl(UrlConstants.MENU_BASE);
-        return RetrofitManager.api().getLogin()
+        return RetrofitManager.service().getLogin()
                 .retry(2)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -41,7 +41,7 @@ final class MenuUtils {
 
     public static Observable<Document> dinnerObservable() {
         RetrofitManager.setBaseUrl(UrlConstants.MENU_BASE);
-        return RetrofitManager.api().getLogin()
+        return RetrofitManager.service().getLogin()
                 .retry(2)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

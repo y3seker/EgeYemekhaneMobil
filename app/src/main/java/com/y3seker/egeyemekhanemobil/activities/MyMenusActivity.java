@@ -35,7 +35,6 @@ import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.ui.MenuRVAdapter;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.nodes.Document;
@@ -44,7 +43,6 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,11 +58,6 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
 
     private static final String TAG = MyMenusActivity.class.getSimpleName();
     private static final String NO_RESULT = "ctl00_ContentPlaceHolder1_Label2";
-
-    private DatePickerDialog fromDatePickerDialog, toDatePickerDialog;
-    private Calendar fromDate, toDate;
-    private boolean isFirstPageLoaded;
-
     @BindView(R.id.root_layout)
     CoordinatorLayout coLayout;
     @BindView(R.id.mymenus_toolbar)
@@ -79,11 +72,59 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     EditText fromDateText;
     @BindView(R.id.mymenus_rv)
     RecyclerView recyclerView;
-
+    private DatePickerDialog fromDatePickerDialog, toDatePickerDialog;
+    private Calendar fromDate, toDate;
+    private boolean isFirstPageLoaded;
     private ArrayList<MyMenusItem> myMenuz;
     private MenuRVAdapter rvAdapter;
     private Snackbar noResultSnackBar;
     private CoordinatorLayout.LayoutParams fabLP;
+
+    public static ArrayList<MyMenusItem> parseMenus(Document doc) throws NullPointerException {
+        ArrayList<MyMenusItem> items = new ArrayList<>();
+        if (doc.getElementById(NO_RESULT) != null && doc.getElementById(NO_RESULT).hasText()) {
+            return null;
+        }
+
+        Element table = doc.getElementById("ctl00_ContentPlaceHolder1_GridView1").child(0);
+        final Elements list = table.children();
+        list.remove(0);
+
+        for (Element element : list) {
+            String dateString = element.children().get(2).text();
+            String[] dateFields = dateString.split("\\.");
+            Calendar c = Calendar.getInstance();
+            c.set(Integer.parseInt(dateFields[2]), Integer.parseInt(dateFields[1]) - 1, Integer.parseInt(dateFields[0]));
+            MyMenusItem mmi = findMyMenusItem(items, c);
+            if (mmi != null) {
+                mmi.setMeals(element.children().get(3).text());
+            } else {
+                items.add(new MyMenusItem(c, element.children()));
+            }
+        }
+        return items;
+    }
+
+    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c) {
+        for (MyMenusItem myMenusItem : list) {
+            if (Utils.isSameDay(myMenusItem.date, c))
+                return myMenusItem;
+        }
+        return null;
+    }
+
+    public static FormBody getMyMenusRequestBody(Calendar from, Calendar to) {
+        return new FormBody.Builder()
+                .add("ctl00$ContentPlaceHolder1$DropDownList2", Utils.twoDigit.format(from.get(Calendar.DAY_OF_MONTH)))
+                .add("ctl00$ContentPlaceHolder1$DropDownList3", Utils.twoDigit.format(from.get(Calendar.MONTH) + 1))
+                .add("ctl00$ContentPlaceHolder1$DropDownList4", String.valueOf(from.get(Calendar.YEAR)))
+                .add("ctl00$ContentPlaceHolder1$DropDownList5", Utils.twoDigit.format(to.get(Calendar.DAY_OF_MONTH)))
+                .add("ctl00$ContentPlaceHolder1$DropDownList6", Utils.twoDigit.format(to.get(Calendar.MONTH) + 1))
+                .add("ctl00$ContentPlaceHolder1$DropDownList7", String.valueOf(to.get(Calendar.YEAR)))
+                .add("ctl00$ContentPlaceHolder1$DropDownList1", "K,O,A")
+                .add("ctl00$ContentPlaceHolder1$Button2", "Sorgula")
+                .build();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +162,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
 
     private void getFirstPage() {
         showProgressBar();
-        RetrofitManager.api().getMyMenus().cache()
+        RetrofitManager.service().getMyMenus().cache()
                 .retry(2)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -152,8 +193,8 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     private void postDates() {
         showProgressBar();
         rvAdapter.clearList();
-        FormBody formBody = getMyMenusRequestBody(user.getViewStates(), fromDate, toDate);
-        RetrofitManager.api().postMyMenus(formBody)
+        FormBody formBody = getMyMenusRequestBody(fromDate, toDate);
+        RetrofitManager.service().postMyMenus(formBody)
                 .retry(2)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -187,52 +228,6 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
         rvAdapter.changeList(myMenuz);
         hideProgressBar();
         toolbar.setTitle(doc.select("[class=ogunust]").first().text());
-    }
-
-    public static ArrayList<MyMenusItem> parseMenus(Document doc) throws NullPointerException {
-        ArrayList<MyMenusItem> items = new ArrayList<>();
-        if (doc.getElementById(NO_RESULT) != null && doc.getElementById(NO_RESULT).hasText()) {
-            return null;
-        }
-
-        Element table = doc.getElementById("ctl00_ContentPlaceHolder1_GridView1").child(0);
-        final Elements list = table.children();
-        list.remove(0);
-
-        for (Element element : list) {
-            String dateString = element.children().get(2).text();
-            String[] dateFields = dateString.split("\\.");
-            Calendar c = Calendar.getInstance();
-            c.set(Integer.parseInt(dateFields[2]), Integer.parseInt(dateFields[1]) - 1, Integer.parseInt(dateFields[0]));
-            MyMenusItem mmi = findMyMenusItem(items,c);
-            if (mmi != null) {
-                mmi.setMeals(element.children().get(3).text());
-            } else {
-                items.add(new MyMenusItem(c, element.children()));
-            }
-        }
-        return items;
-    }
-
-    public static MyMenusItem findMyMenusItem(ArrayList<MyMenusItem> list, Calendar c) {
-        for (MyMenusItem myMenusItem : list) {
-            if (Utils.isSameDay(myMenusItem.date, c))
-                return myMenusItem;
-        }
-        return null;
-    }
-
-    public static FormBody getMyMenusRequestBody(HashMap<String, String> viewStates, Calendar from, Calendar to) {
-        return ConnectionUtils.febWithViewStates(viewStates)
-                .add("ctl00$ContentPlaceHolder1$DropDownList2", Utils.twoDigit.format(from.get(Calendar.DAY_OF_MONTH)))
-                .add("ctl00$ContentPlaceHolder1$DropDownList3", Utils.twoDigit.format(from.get(Calendar.MONTH) + 1))
-                .add("ctl00$ContentPlaceHolder1$DropDownList4", String.valueOf(from.get(Calendar.YEAR)))
-                .add("ctl00$ContentPlaceHolder1$DropDownList5", Utils.twoDigit.format(to.get(Calendar.DAY_OF_MONTH)))
-                .add("ctl00$ContentPlaceHolder1$DropDownList6", Utils.twoDigit.format(to.get(Calendar.MONTH) + 1))
-                .add("ctl00$ContentPlaceHolder1$DropDownList7", String.valueOf(to.get(Calendar.YEAR)))
-                .add("ctl00$ContentPlaceHolder1$DropDownList1", "K,O,A")
-                .add("ctl00$ContentPlaceHolder1$Button2", "Sorgula")
-                .build();
     }
 
     private void setupPickers() {

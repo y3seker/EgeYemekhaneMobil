@@ -17,6 +17,7 @@
 package com.y3seker.egeyemekhanemobil.utils;
 
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
+import com.y3seker.egeyemekhanemobil.localapi.parsers.LoginParser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,8 +30,6 @@ import java.util.HashMap;
  * -
  */
 public final class ParseUtils {
-
-    // From document
 
     public static HashMap<String, String> extractViewState(Document document) throws NullPointerException {
         HashMap<String, String> result = new HashMap<>();
@@ -46,14 +45,6 @@ public final class ParseUtils {
         viewStates.put(ParseConstants.EVENT_VAL, document.getElementById(ParseConstants.EVENT_VAL).val());
     }
 
-    public static String getUserName(Document document) {
-        return document.getElementById(ParseConstants.USERS_NAME).text();
-    }
-
-    public static boolean isLoginPage(Document doc) {
-        return doc.getElementById(ParseConstants.LOGIN) != null;
-    }
-
     public static boolean isBlockedPaged(Document doc) {
         return doc.getElementById("box") != null;
     }
@@ -61,12 +52,6 @@ public final class ParseUtils {
     public static boolean isOrderWarningPage(Document doc) {
         return doc.select("form").first().attr("action").equals("./hata.aspx?no=1");
     }
-
-    public static boolean isLoginSucceed(Document doc) {
-        return doc.getElementById(ParseConstants.LOGIN) == null;
-    }
-
-    // From string
 
     public static HashMap<String, String> extractViewState(String rawHTML) {
         HashMap<String, String> result = new HashMap<>();
@@ -86,7 +71,7 @@ public final class ParseUtils {
     }
 
     public static boolean isLoginPage(String rawHTML) {
-        return isLoginPage(Jsoup.parse(rawHTML));
+        return LoginParser.isLoginPage(Jsoup.parse(rawHTML));
     }
 
     public static String getUserName(String rawHTML) {

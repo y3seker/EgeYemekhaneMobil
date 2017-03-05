@@ -16,6 +16,8 @@
 
 package com.y3seker.egeyemekhanemobil.utils;
 
+import com.y3seker.egeyemekhanemobil.localapi.parsers.LoginParser;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -43,13 +45,13 @@ public class ParseUtilsTest {
 
     @org.junit.Test
     public void getUserName() throws Exception {
-        assertEquals(ParseUtils.getUserName(homePage), "YUNUS EMRE ŞEKER");
+        assertEquals(LoginParser.getUserName(homePage), "YUNUS EMRE ŞEKER");
     }
 
     @org.junit.Test
     public void isLoginPage() throws Exception {
-        assertTrue(ParseUtils.isLoginPage(loginPage));
-        assertFalse(ParseUtils.isLoginPage(homePage));
+        assertTrue(LoginParser.isLoginPage(loginPage));
+        assertFalse(LoginParser.isLoginPage(homePage));
     }
 
     @org.junit.Test
@@ -65,7 +67,7 @@ public class ParseUtilsTest {
 
     @org.junit.Test
     public void isLoginSucceed() throws Exception {
-        assertFalse(ParseUtils.isLoginSucceed(loginPage));
-        assertTrue(ParseUtils.isLoginSucceed(homePage));
+        assertFalse(LoginParser.isLoginSucceed(loginPage));
+        assertTrue(LoginParser.isLoginSucceed(homePage));
     }
 }

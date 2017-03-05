@@ -28,7 +28,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-public class DocumentConverterFactory extends Converter.Factory {
+class DocumentConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
@@ -38,6 +38,7 @@ public class DocumentConverterFactory extends Converter.Factory {
                 @Override
                 public Document convert(ResponseBody responseBody) throws IOException {
                     Document doc = Jsoup.parse(responseBody.string());
+                    responseBody.close();
                     return doc;
                 }
             };

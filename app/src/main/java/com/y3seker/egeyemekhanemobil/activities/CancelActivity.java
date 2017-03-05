@@ -31,7 +31,6 @@ import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.CancelItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.ui.CancelRVAdapter;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -102,7 +101,7 @@ public class CancelActivity extends BaseActivity {
 
     private void getFirstPage() {
         showProgressBar();
-        RetrofitManager.api().getCancel().cache()
+        RetrofitManager.service().getCancel().cache()
                 .retry(2)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)
@@ -152,7 +151,7 @@ public class CancelActivity extends BaseActivity {
     private void postTheCancel() {
         fab.hide();
         showProgressBar();
-        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = new FormBody.Builder();
         for (CancelItem cancelItem : cancelItems) {
             if (cancelItem.isChecked) {
                 feb.add(cancelItem.name, "on");
@@ -162,7 +161,7 @@ public class CancelActivity extends BaseActivity {
                 .add(ParseConstants.EVENT_TARGET, "ctl00$ContentPlaceHolder1$Button2")
                 .add(ParseConstants.EVENT_ARG, "")
                 .build();
-        RetrofitManager.api().postCancel(formBody)
+        RetrofitManager.service().postCancel(formBody)
                 .retry(1)
                 .compose(this.bindToLifecycle())
                 .cast(Document.class)

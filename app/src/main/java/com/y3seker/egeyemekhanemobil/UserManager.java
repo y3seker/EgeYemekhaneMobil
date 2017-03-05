@@ -23,15 +23,9 @@ import android.support.annotation.NonNull;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
+import com.y3seker.egeyemekhanemobil.localapi.LocalAPI;
 import com.y3seker.egeyemekhanemobil.models.User;
-import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
-import com.y3seker.egeyemekhanemobil.retrofit.SerializableHttpCookie;
-import com.y3seker.egeyemekhanemobil.utils.ConnectionUtils;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 
-import org.jsoup.nodes.Document;
-
-import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,9 +62,6 @@ public class UserManager {
         long defaultUserID = appPrefs.getLong(PrefConstants.DEFAULT_USER, 0);
         if (!users.isEmpty()) {
             for (User user : users) {
-                String cookie = cookiesPrefs.getString(user.getCookieKey(), "");
-                if (!cookie.isEmpty())
-                    user.setCookie(new SerializableHttpCookie().decode(cookie));
                 if (user.getUniqeID() == defaultUserID)
                     currentUser = user;
             }
@@ -83,7 +74,7 @@ public class UserManager {
         }
     }
 
-    public Subscription login(int id, RxAppCompatActivity context, final Subscriber<Document> caller) {
+    public Subscription login(int id, RxAppCompatActivity context, final Subscriber<User> caller) {
         User selectedUser = getUserByHashcode(id);
         if (selectedUser == null) {
             caller.onError(new IllegalStateException("User has not found with id:" + id));
@@ -92,7 +83,7 @@ public class UserManager {
         return login(selectedUser, context, caller);
     }
 
-    public Subscription login(RxAppCompatActivity context, final Subscriber<Document> caller) {
+    public Subscription login(RxAppCompatActivity context, final Subscriber<User> caller) {
         if (currentUser == null) {
             caller.onError(new IllegalStateException("No user found!"));
             return null;
@@ -100,7 +91,7 @@ public class UserManager {
         return login(currentUser, context, caller);
     }
 
-    public Subscription login(@NonNull final User user, RxAppCompatActivity context, final Subscriber<Document> caller) {
+    public Subscription login(@NonNull final User user, RxAppCompatActivity context, final Subscriber<User> caller) {
         if (user.isLoggedIn()) {
             currentUser = user;
             caller.onNext(null);
@@ -108,69 +99,50 @@ public class UserManager {
             return null;
         }
 
-        return ConnectionUtils.loginObservable(user)
-                .compose(context.bindToLifecycle())
-                .cast(Document.class)
-                .subscribe(new Subscriber<Document>() {
-                    @Override
-                    public void onCompleted() {
-                        caller.onCompleted();
-                    }
+        return LocalAPI.get().login(user, context, new Subscriber<User>() {
+            @Override
+            public void onCompleted() {
+                caller.onCompleted();
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        caller.onError(e);
-                    }
+            @Override
+            public void onError(Throwable e) {
+                user.setIsLoggedIn(false);
+                caller.onError(e);
+            }
 
-                    @Override
-                    public void onNext(Document document) {
-                        if (ParseUtils.isLoginPage(document))
-                            onError(new InvalidCredentialException("Credentials invalid for user: " + user.getUniqeID()));
-                        else {
-                            HttpCookie cookie = RetrofitManager.getCookie();
-                            if (cookie != null) {
-                                cookiesPrefs.edit()
-                                        .putString(user.getCookieKey(), new SerializableHttpCookie().encode(cookie))
-                                        .apply();
-                            }
-                            //user.setViewStates(ParseUtils.extractViewState(document));
-                            if (user.getName().isEmpty()) {
-                                user.setName(ParseUtils.getUserName(document));
-                                database.updateUser(user);
-                            }
-                            user.setCookie(cookie);
-                            user.setIsLoggedIn(true);
-                            currentUser = user;
-                            caller.onNext(document);
-                        }
-                    }
-                });
+            @Override
+            public void onNext(User user) {
+                if (user.isLoggedIn()) {
+                    addUser(user);
+                    user.setIsLoggedIn(true);
+                    setCurrentUser(user);
+                    //database.updateUser(user);
+                }
+                caller.onNext(user);
+            }
+        });
     }
 
     public boolean isUserExist(User u) {
-        if (users != null && !users.isEmpty()) {
-            for (User user : users) {
-                if (user.getUniqeID() == u.getUniqeID())
-                    return true;
-            }
-            return false;
-        } else
-            return false;
+        return users != null && users.contains(u);
     }
 
     public UserManager addUser(User newUser) {
-        // If this is first ever user, make it default
-        if (users.isEmpty()) {
-            appPrefs.edit()
-                    .putLong(PrefConstants.DEFAULT_USER, newUser.getUniqeID()).apply();
+        if (!users.contains(newUser)) {
+            users.add(newUser);
+            database.insertUser(newUser);
+            // If this is first user ever, make it default
+            if (users.isEmpty())
+                appPrefs.edit()
+                        .putLong(PrefConstants.DEFAULT_USER, newUser.getUniqeID())
+                        .apply();
         }
-        users.add(newUser);
-        database.insertUser(newUser);
         return mInstance;
     }
 
     public boolean hasUser() {
-        return !users.isEmpty();
+        return users != null && !users.isEmpty();
     }
 
     public List<User> getUsers() {
@@ -189,11 +161,7 @@ public class UserManager {
     public boolean deleteCurrentUser() {
         if (database.deleteUser(currentUser.getUniqeID())) {
             users.remove(currentUser);
-            if (users.isEmpty()) {
-                setCurrentUser(null);
-            } else {
-                setCurrentUser(users.get(0));
-            }
+            setCurrentUser(users.isEmpty() ? null : users.get(0));
             return true;
         }
         return false;
