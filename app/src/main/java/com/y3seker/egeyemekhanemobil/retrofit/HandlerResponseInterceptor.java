@@ -16,10 +16,6 @@
 
 package com.y3seker.egeyemekhanemobil.retrofit;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.OrderSessionException;
@@ -30,16 +26,26 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Created by Yunus Emre Şeker on 1.11.2015.
  * -
  */
 class HandlerResponseInterceptor implements Interceptor {
+    private Map<String, String> lastViewStates = new HashMap<>();
+
     @Override
     public Response intercept(Chain chain) throws IOException {
-        URL url = chain.request().url();
+        HttpUrl url = chain.request().url();
         Response response = chain.proceed(chain.request());
         MediaType contentType = response.body().contentType();
         String body = response.body().string();
@@ -50,11 +56,17 @@ class HandlerResponseInterceptor implements Interceptor {
 
         if (ParseUtils.isBlockedPaged(document))
             throw new RequestBlockedException();
-        else if (!url.getPath().equals(UrlConstants.C_DEFAULT) && ParseUtils.isLoginPage(document))
+        else if (!url.encodedPath().equals(UrlConstants.C_DEFAULT) && ParseUtils.isLoginPage(document))
             throw new NonLoginException();
         else if (ParseUtils.isOrderWarningPage(document))
             throw new OrderSessionException();
-        //Log.d("Handler", response.headers().toString());
+
         return response.newBuilder().body(ResponseBody.create(contentType, body)).build();
+    }
+
+    private void handleViewStates(Chain chain) {
+        if (chain.request().method().equals("POST") && !lastViewStates.isEmpty()) {
+            RequestBody body = chain.request().body();
+        }
     }
 }

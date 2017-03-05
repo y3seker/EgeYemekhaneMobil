@@ -133,7 +133,7 @@ public class UserManager {
                                         .putString(user.getCookieKey(), new SerializableHttpCookie().encode(cookie))
                                         .apply();
                             }
-                            user.setViewStates(ParseUtils.extractViewState(document));
+                            //user.setViewStates(ParseUtils.extractViewState(document));
                             if (user.getName().isEmpty()) {
                                 user.setName(ParseUtils.getUserName(document));
                                 database.updateUser(user);

@@ -37,7 +37,7 @@ import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 
 import org.jsoup.nodes.Document;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscriber;
@@ -51,20 +51,20 @@ public class AddUserActivity extends RxAppCompatActivity {
 
     private static final String TAG = AddUserActivity.class.getSimpleName();
 
-    @Bind(R.id.addnewuser_button)
+    @BindView(R.id.addnewuser_button)
     FloatingActionButton loginButton;
-    @Bind(R.id.addnewuser_username_wrapper)
+    @BindView(R.id.addnewuser_username_wrapper)
     TextInputLayout usernameWrapper;
-    @Bind(R.id.addnewuser_password_wrapper)
+    @BindView(R.id.addnewuser_password_wrapper)
     TextInputLayout passwordWrapper;
-    @Bind(R.id.addnewuser_username)
+    @BindView(R.id.addnewuser_username)
     EditText username;
-    @Bind(R.id.addnewuser_password)
+    @BindView(R.id.addnewuser_password)
     EditText password;
     //TODO correct spinner theme
-    @Bind(R.id.addnewuser_caf_spinner)
+    @BindView(R.id.addnewuser_caf_spinner)
     AppCompatSpinner cafSpinner;
-    @Bind(R.id.addnewuser_cancel)
+    @BindView(R.id.addnewuser_cancel)
     TextView cancelText;
     ProgressDialog progressDialog;
     User newUser;
@@ -87,7 +87,6 @@ public class AddUserActivity extends RxAppCompatActivity {
         ButterKnife.bind(this);
         newUser = new User();
         cafSpinner.setSelection(1, true);
-        RetrofitManager.removeCookies();
         password.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {

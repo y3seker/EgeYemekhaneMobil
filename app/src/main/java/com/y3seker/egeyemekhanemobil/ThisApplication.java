@@ -18,6 +18,8 @@ package com.y3seker.egeyemekhanemobil;
 
 import android.app.Application;
 
+import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
+
 /**
  * Created by Yunus Emre Şeker on 13.10.2015.
  * -
@@ -27,6 +29,7 @@ public class ThisApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        RetrofitManager.instance().init(this);
         UserManager.getInstance().init(this);
     }
 

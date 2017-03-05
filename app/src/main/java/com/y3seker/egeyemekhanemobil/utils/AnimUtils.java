@@ -16,10 +16,10 @@
 
 package com.y3seker.egeyemekhanemobil.utils;
 
+import android.animation.Animator;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 
 /**
@@ -29,37 +29,33 @@ import io.codetail.animation.ViewAnimationUtils;
 public final class AnimUtils {
     public static String TAG = "REVEAL_EFFECT";
 
-    public interface AnimationListener {
-        void onAnimEnd();
-    }
-
-    public static SupportAnimator revealFrom(int x, int y, View target, int duration, final AnimationListener callback) {
+    public static Animator revealFrom(int x, int y, View target, int duration, final AnimationListener callback) {
         int radius = Math.max(target.getWidth(), target.getHeight());
 
-        SupportAnimator animator2 = ViewAnimationUtils.createCircularReveal(target, x, y, 0, radius);
+        Animator animator2 = ViewAnimationUtils.createCircularReveal(target, x, y, 0, radius);
 
         if (duration > 0)
             animator2.setDuration(duration);
 
-        animator2.addListener(new SupportAnimator.AnimatorListener() {
+        animator2.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart() {
+            public void onAnimationStart(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationEnd() {
+            public void onAnimationEnd(Animator animator) {
                 if (callback != null)
                     callback.onAnimEnd();
             }
 
             @Override
-            public void onAnimationCancel() {
+            public void onAnimationCancel(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationRepeat() {
+            public void onAnimationRepeat(Animator animator) {
 
             }
         });
@@ -72,35 +68,39 @@ public final class AnimUtils {
     public static void collapseTo(int x, int y, final View target, int duration, final AnimationListener callback) {
         int radius = Math.max(target.getWidth(), target.getHeight());
 
-        SupportAnimator animator2 = ViewAnimationUtils.createCircularReveal(target, x, y, radius, 0);
+        Animator animator2 = ViewAnimationUtils.createCircularReveal(target, x, y, radius, 0);
 
         if (duration > 0)
             animator2.setDuration(duration);
         target.setVisibility(View.VISIBLE);
-        animator2.addListener(new SupportAnimator.AnimatorListener() {
+        animator2.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart() {
+            public void onAnimationStart(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationEnd() {
+            public void onAnimationEnd(Animator animator) {
                 target.setVisibility(View.GONE);
                 if (callback != null) callback.onAnimEnd();
             }
 
             @Override
-            public void onAnimationCancel() {
+            public void onAnimationCancel(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationRepeat() {
+            public void onAnimationRepeat(Animator animator) {
 
             }
         });
         animator2.setInterpolator(new AccelerateDecelerateInterpolator());
         animator2.start();
+    }
+
+    public interface AnimationListener {
+        void onAnimEnd();
     }
 
 }

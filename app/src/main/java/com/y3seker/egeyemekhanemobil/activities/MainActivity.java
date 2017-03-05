@@ -43,7 +43,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.trello.rxlifecycle.ActivityEvent;
+import com.trello.rxlifecycle.android.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.UserManager;
@@ -67,7 +67,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
@@ -80,13 +80,13 @@ public class MainActivity extends RxAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    @Bind(R.id.main_appbar)
+    @BindView(R.id.main_appbar)
     AppBarLayout appBarLayout;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.main_image)
+    @BindView(R.id.main_image)
     ImageView mainImage;
-    @Bind(R.id.main_rv)
+    @BindView(R.id.main_rv)
     RecyclerView mainRV;
     Menu menu;
     MainRVAdapter mainRVAdapter;
@@ -104,6 +104,7 @@ public class MainActivity extends RxAppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.setDebug(true);
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);

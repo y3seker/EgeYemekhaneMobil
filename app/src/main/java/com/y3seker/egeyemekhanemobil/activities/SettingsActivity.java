@@ -37,7 +37,7 @@ import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -46,7 +46,7 @@ import butterknife.ButterKnife;
  */
 public class SettingsActivity extends AppCompatActivity {
 
-    @Bind(R.id.settings_toolbar)
+    @BindView(R.id.settings_toolbar)
     Toolbar toolbar;
     private SharedPreferences appPrefs;
 

@@ -18,8 +18,6 @@ package com.y3seker.egeyemekhanemobil.utils;
 
 import android.util.Log;
 
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 import com.y3seker.egeyemekhanemobil.models.User;
@@ -29,6 +27,8 @@ import org.jsoup.nodes.Document;
 
 import java.util.HashMap;
 
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -41,7 +41,7 @@ import rx.schedulers.Schedulers;
 public final class ConnectionUtils {
 
     private static Observable<Object> forceLoginObservable(final User user) {
-        RetrofitManager.setBaseUrl(user.getBaseUrl());
+        //RetrofitManager.setBaseUrl(user.getBaseUrl());
         return RetrofitManager.api().getLogin()
                 .flatMap(new Func1<Document, Observable<?>>() {
 
@@ -59,13 +59,14 @@ public final class ConnectionUtils {
     }
 
     public static Observable<Document> loginObservable(final User user) {
-        RetrofitManager.setBaseUrl(user.getBaseUrl());
-        RetrofitManager.addCookie(user.getCookie());
-        return RetrofitManager.api().getHome()
-                .retry(1)
-                .onErrorResumeNext(ConnectionUtils.forceLoginObservable(user).cast(Document.class))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        //RetrofitManager.setBaseUrl(user.getBaseUrl());
+        //RetrofitManager.addCookie(user.getCookie());
+        return forceLoginObservable(user).cast(Document.class);
+//        return RetrofitManager.api().getHome()
+//                .retry(1)
+//                .onErrorResumeNext(ConnectionUtils.forceLoginObservable(user).cast(Document.class))
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
@@ -92,8 +93,8 @@ public final class ConnectionUtils {
         }
     }
 
-    public static FormEncodingBuilder febWithViewStates(HashMap<String, String> viewStates) {
-        return new FormEncodingBuilder()
+    public static FormBody.Builder febWithViewStates(HashMap<String, String> viewStates) {
+        return new FormBody.Builder()
                 .add(ParseConstants.VIEW_STATE, viewStates.get(ParseConstants.VIEW_STATE))
                 .add(ParseConstants.VIEW_STATE_GEN, viewStates.get(ParseConstants.VIEW_STATE_GEN))
                 .add(ParseConstants.EVENT_VAL, viewStates.get(ParseConstants.EVENT_VAL));

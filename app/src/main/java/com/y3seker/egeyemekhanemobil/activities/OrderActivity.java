@@ -34,9 +34,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.RequestBody;
-import com.trello.rxlifecycle.ActivityEvent;
+import com.trello.rxlifecycle.android.ActivityEvent;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.OrderItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -55,8 +53,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.FormBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -90,25 +89,25 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     private boolean inProgress = false;
     private CoordinatorLayout.LayoutParams fabLP;
 
-    @Bind(R.id.root_layout)
+    @BindView(R.id.root_layout)
     CoordinatorLayout coLayout;
-    @Bind(R.id.order_appbar)
+    @BindView(R.id.order_appbar)
     AppBarLayout appBar;
-    @Bind(R.id.order_toolbar)
+    @BindView(R.id.order_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.order_spinner)
+    @BindView(R.id.order_spinner)
     AppCompatSpinner spinner;
-    @Bind(R.id.order_fab)
+    @BindView(R.id.order_fab)
     FloatingActionButton fab;
-    @Bind(R.id.order_kalan_text)
+    @BindView(R.id.order_kalan_text)
     TextView kalanText;
-    @Bind(R.id.order_harcanan_text)
+    @BindView(R.id.order_harcanan_text)
     TextView harcananText;
-    @Bind(R.id.order_progress)
+    @BindView(R.id.order_progress)
     ProgressBar progressBar;
-    @Bind(R.id.order_divider)
+    @BindView(R.id.order_divider)
     View cardDivider;
-    @Bind(R.id.order_rv)
+    @BindView(R.id.order_rv)
     RecyclerView recyclerView;
 
     private CompositeSubscription postSubs;
@@ -217,7 +216,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
                             spinnerValues.add(input.attr("value"));
                         }
                         user.setViewStates(ParseUtils.extractViewState((document)));
-                        RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+                        FormBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                                 .add("ctl00$ContentPlaceHolder1$Button1", "İleri")
                                 .add("ctl00$ContentPlaceHolder1$osec",
                                         spinnerValues.isEmpty() ? "RadioButton2" : spinnerValues.get(menuType))
@@ -297,7 +296,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void postItem(String name, final int pos) {
         hideFab();
-        FormEncodingBuilder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
         boolean hasCheckedItem = false;
         for (OrderItem orderItem : orderItems) {
             if (orderItem.isChecked) {
@@ -306,7 +305,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
             }
         }
         final boolean finalHasCheckItem = hasCheckedItem;
-        RequestBody formBody = feb.add(EVENT_TARGET, name)
+        FormBody formBody = feb.add(EVENT_TARGET, name)
                 .add(EVENT_ARG, "").build();
         Subscription sub = RetrofitManager.api().postOrder(formBody)
                 .retry(1)
@@ -338,13 +337,13 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void postTheOrder() {
         showProgressDialog("Sipariş işleniyor");
-        FormEncodingBuilder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
         for (OrderItem orderItem : orderItems) {
             if (orderItem.isChecked) {
                 feb.add(orderItem.name, "on");
             }
         }
-        RequestBody postOrderBody = feb
+        FormBody postOrderBody = feb
                 .add(EVENT_TARGET, "")
                 .add(EVENT_ARG, "")
                 .add("ctl00$ContentPlaceHolder1$Button3", NEXT)
@@ -432,7 +431,7 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void verifyTheOrder() {
         showProgressDialog(getString(R.string.verifing_order));
-        RequestBody verifyOrderBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+        FormBody verifyOrderBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                 .add(EVENT_TARGET, "ctl00$ContentPlaceHolder1$Button6")
                 .add(EVENT_ARG, "")
                 .build();

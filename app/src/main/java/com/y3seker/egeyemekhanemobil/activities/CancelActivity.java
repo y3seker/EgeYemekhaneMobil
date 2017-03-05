@@ -26,8 +26,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.CancelItem;
@@ -42,8 +40,10 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -54,24 +54,21 @@ import rx.schedulers.Schedulers;
 public class CancelActivity extends BaseActivity {
 
     private static final String TAG = CancelActivity.class.getSimpleName();
-
+    @BindView(R.id.root_layout)
+    CoordinatorLayout coLayout;
+    @BindView(R.id.cancel_toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.cancel_fab)
+    FloatingActionButton fab;
+    @BindView(R.id.cancel_rv)
+    RecyclerView recyclerView;
+    @BindView(R.id.cancel_no_item)
+    TextView noItemInfo;
     private String BASE_URL = "";
     private String URL = "";
     private List<CancelItem> cancelItems;
     private CancelRVAdapter rvAdapter;
     private int checkedCount = 0;
-
-
-    @Bind(R.id.root_layout)
-    CoordinatorLayout coLayout;
-    @Bind(R.id.cancel_toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.cancel_fab)
-    FloatingActionButton fab;
-    @Bind(R.id.cancel_rv)
-    RecyclerView recyclerView;
-    @Bind(R.id.cancel_no_item)
-    TextView noItemInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +152,7 @@ public class CancelActivity extends BaseActivity {
     private void postTheCancel() {
         fab.hide();
         showProgressBar();
-        FormEncodingBuilder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
+        FormBody.Builder feb = ConnectionUtils.febWithViewStates(user.getViewStates());
         for (CancelItem cancelItem : cancelItems) {
             if (cancelItem.isChecked) {
                 feb.add(cancelItem.name, "on");

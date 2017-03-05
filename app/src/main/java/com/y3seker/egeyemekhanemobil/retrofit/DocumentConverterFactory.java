@@ -16,9 +16,6 @@
 
 package com.y3seker.egeyemekhanemobil.retrofit;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ResponseBody;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,45 +24,24 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import retrofit.Converter;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Retrofit;
 
-/**
- * Created by floating @stackoverflow
- * -
- */
-final class DocumentConverterFactory extends Converter.Factory {
+public class DocumentConverterFactory extends Converter.Factory {
 
     @Override
-    public Converter<ResponseBody, ?> fromResponseBody(Type type, Annotation[] annotations) {
-        //noinspection EqualsBetweenInconvertibleTypes
+    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
         if (Document.class.equals(type)) {
-            return new Converter<ResponseBody, Object>() {
+            return new Converter<ResponseBody, Document>() {
 
                 @Override
-                public Object convert(ResponseBody responseBody) throws IOException {
+                public Document convert(ResponseBody responseBody) throws IOException {
                     Document doc = Jsoup.parse(responseBody.string());
-                    responseBody.close();
                     return doc;
                 }
             };
         }
-
-        return null;
-    }
-
-    @Override
-    public Converter<?, RequestBody> toRequestBody(Type type, Annotation[] annotations) {
-        //noinspection EqualsBetweenInconvertibleTypes
-        if (Document.class.equals(type)) {
-            return new Converter<String, RequestBody>() {
-
-                @Override
-                public RequestBody convert(String value) throws IOException {
-                    return RequestBody.create(MediaType.parse("text/plain"), value);
-                }
-            };
-        }
-
-        return null;
+        return super.responseBodyConverter(type, annotations, retrofit);
     }
 }

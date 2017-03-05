@@ -31,7 +31,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
@@ -47,8 +46,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.FormBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -65,19 +65,19 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     private Calendar fromDate, toDate;
     private boolean isFirstPageLoaded;
 
-    @Bind(R.id.root_layout)
+    @BindView(R.id.root_layout)
     CoordinatorLayout coLayout;
-    @Bind(R.id.mymenus_toolbar)
+    @BindView(R.id.mymenus_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.mymenus_appbar)
+    @BindView(R.id.mymenus_appbar)
     AppBarLayout appBar;
-    @Bind(R.id.mymenus_fab)
+    @BindView(R.id.mymenus_fab)
     FloatingActionButton fab;
-    @Bind(R.id.mymenus_end_date)
+    @BindView(R.id.mymenus_end_date)
     EditText toDateText;
-    @Bind(R.id.mymenus_start_date)
+    @BindView(R.id.mymenus_start_date)
     EditText fromDateText;
-    @Bind(R.id.mymenus_rv)
+    @BindView(R.id.mymenus_rv)
     RecyclerView recyclerView;
 
     private ArrayList<MyMenusItem> myMenuz;
@@ -152,7 +152,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
     private void postDates() {
         showProgressBar();
         rvAdapter.clearList();
-        RequestBody formBody = getMyMenusRequestBody(user.getViewStates(), fromDate, toDate);
+        FormBody formBody = getMyMenusRequestBody(user.getViewStates(), fromDate, toDate);
         RetrofitManager.api().postMyMenus(formBody)
                 .retry(2)
                 .compose(this.bindToLifecycle())
@@ -222,7 +222,7 @@ public class MyMenusActivity extends BaseActivity implements View.OnClickListene
         return null;
     }
 
-    public static RequestBody getMyMenusRequestBody(HashMap<String, String> viewStates, Calendar from, Calendar to) {
+    public static FormBody getMyMenusRequestBody(HashMap<String, String> viewStates, Calendar from, Calendar to) {
         return ConnectionUtils.febWithViewStates(viewStates)
                 .add("ctl00$ContentPlaceHolder1$DropDownList2", Utils.twoDigit.format(from.get(Calendar.DAY_OF_MONTH)))
                 .add("ctl00$ContentPlaceHolder1$DropDownList3", Utils.twoDigit.format(from.get(Calendar.MONTH) + 1))

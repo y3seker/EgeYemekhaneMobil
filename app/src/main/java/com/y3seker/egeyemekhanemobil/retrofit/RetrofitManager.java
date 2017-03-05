@@ -16,16 +16,23 @@
 
 package com.y3seker.egeyemekhanemobil.retrofit;
 
-import com.squareup.okhttp.OkHttpClient;
+import android.content.Context;
+
+import com.franmontiel.persistentcookiejar.ClearableCookieJar;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.y3seker.egeyemekhanemobil.ThisApplication;
 import com.y3seker.egeyemekhanemobil.constants.UrlConstants;
 
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
-import java.util.concurrent.TimeUnit;
 
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+
 
 /**
  * Created by Yunus Emre Şeker on 17.10.2015.
@@ -33,49 +40,39 @@ import retrofit.RxJavaCallAdapterFactory;
  */
 public class RetrofitManager {
 
-    private static Retrofit retrofit;
-    private static OkHttpClient okHttpClient;
-    private static CookieManager cookieManager;
-    private static ConnectionService service;
-    private static BaseUrlManager baseUrlManager;
+    private static RetrofitManager mInstance = new RetrofitManager();
+    private Retrofit retrofit;
+    private OkHttpClient okHttpClient;
+    private ConnectionService service;
+    private ClearableCookieJar cookieJar;
 
-    static {
-        setup();
+    public static RetrofitManager instance(){
+        return mInstance;
     }
 
     public static ConnectionService api() {
-        if (retrofit == null) {
-            setup();
-        }
-        return service;
+        return instance().getApi();
     }
 
     public static void setBaseUrl(String url) {
-        baseUrlManager.setBaseUrl(url);
+        //setup(url);
     }
 
     public static void addCookie(HttpCookie cookie) {
-        if (cookie != null)
-            cookieManager.getCookieStore().add(null, cookie);
     }
 
     public static HttpCookie getCookie() {
-        return cookieManager.getCookieStore().getCookies().size() != 0 ?
-                cookieManager.getCookieStore().getCookies().get(0) : null;
+        return null;
     }
 
-    private static void setup() {
-        baseUrlManager = new BaseUrlManager(UrlConstants.SKS1_BASE);
-        okHttpClient = new OkHttpClient();
-        cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        okHttpClient.setCookieHandler(cookieManager);
-        okHttpClient.setConnectTimeout(5, TimeUnit.SECONDS);
-        okHttpClient.setReadTimeout(5, TimeUnit.SECONDS);
-        okHttpClient.setWriteTimeout(5, TimeUnit.SECONDS);
-        okHttpClient.interceptors().add(new HandlerResponseInterceptor());
+    public void init(Context context) {
+        cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
+        okHttpClient = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .addInterceptor(new HandlerResponseInterceptor())
+                .build();
         retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrlManager)
+                .baseUrl(UrlConstants.SKS1_BASE)
                 .client(okHttpClient)
                 .addConverterFactory(new DocumentConverterFactory())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -83,11 +80,7 @@ public class RetrofitManager {
         service = retrofit.create(ConnectionService.class);
     }
 
-    public static void removeCookies() {
-        cookieManager.getCookieStore().removeAll();
-    }
-
-    public static OkHttpClient getOkHttpClient() {
-        return okHttpClient;
+    public ConnectionService getApi() {
+        return service;
     }
 }

@@ -17,15 +17,14 @@
 package com.y3seker.egeyemekhanemobil.retrofit;
 
 
-import com.squareup.okhttp.HttpUrl;
-
-import retrofit.BaseUrl;
+import okhttp3.HttpUrl;
 
 /**
  * Created by Yunus Emre Şeker on 17.10.2015.
  * -
  */
-class BaseUrlManager implements BaseUrl {
+//FIXME
+class BaseUrlManager {
 
     private final String _url;
     private HttpUrl url;
@@ -39,7 +38,6 @@ class BaseUrlManager implements BaseUrl {
         this.url = HttpUrl.parse(url);
     }
 
-    @Override
     public HttpUrl url() {
         return url;
     }

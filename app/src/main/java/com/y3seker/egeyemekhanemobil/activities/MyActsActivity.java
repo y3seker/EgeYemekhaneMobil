@@ -23,7 +23,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.squareup.okhttp.RequestBody;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.MyActsItem;
@@ -38,8 +37,9 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.RequestBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -53,9 +53,9 @@ public class MyActsActivity extends BaseActivity {
 
     private boolean hasPages = false;
 
-    @Bind(R.id.myacts_toolbar)
+    @BindView(R.id.myacts_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.myacts_rv)
+    @BindView(R.id.myacts_rv)
     RecyclerView recyclerView;
 
     private List<MyActsItem> actsHistory;

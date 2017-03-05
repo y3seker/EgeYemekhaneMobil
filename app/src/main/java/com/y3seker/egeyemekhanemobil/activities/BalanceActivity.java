@@ -23,8 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.squareup.okhttp.RequestBody;
-import com.trello.rxlifecycle.ActivityEvent;
+import com.trello.rxlifecycle.android.ActivityEvent;
 import com.y3seker.egeyemekhanemobil.R;
 import com.y3seker.egeyemekhanemobil.constants.ParseConstants;
 import com.y3seker.egeyemekhanemobil.models.BalanceItem;
@@ -39,8 +38,9 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.FormBody;
 
 /**
  * Created by Yunus Emre Şeker on 8.10.2015.
@@ -50,9 +50,9 @@ public class BalanceActivity extends BaseActivity {
 
     private static final String TAG = BalanceActivity.class.getSimpleName();
 
-    @Bind(R.id.balance_toolbar)
+    @BindView(R.id.balance_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.balance_rv)
+    @BindView(R.id.balance_rv)
     RecyclerView recyclerView;
 
     private boolean hasPages = false;
@@ -154,7 +154,7 @@ public class BalanceActivity extends BaseActivity {
 
     private void loadPage(final int nextPage) {
         rvAdapter.showLoadingFooter(true);
-        RequestBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
+        FormBody requestBody = ConnectionUtils.febWithViewStates(user.getViewStates())
                 .add(ParseConstants.EVENT_ARG, "Page$" + nextPage)
                 .add(ParseConstants.EVENT_TARGET, "ctl00$ContentPlaceHolder1$GridView1")
                 .build();
