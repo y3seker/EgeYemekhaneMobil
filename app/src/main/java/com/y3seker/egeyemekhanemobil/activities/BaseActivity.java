@@ -39,7 +39,6 @@ import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 import com.y3seker.egeyemekhanemobil.retrofit.exceptions.NonLoginException;
 import com.y3seker.egeyemekhanemobil.utils.AnimUtils;
-import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
 import org.jsoup.nodes.Document;
@@ -71,7 +70,6 @@ public class BaseActivity extends RxAppCompatActivity {
         revealPos = getIntent().getIntArrayExtra(OtherConstants.REVEAL_POSITION);
         if (user == null)
             throw new NullPointerException("User is null");
-        RetrofitManager.setBaseUrl(user.getBaseUrl());
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         isSavedState = savedInstanceState != null;

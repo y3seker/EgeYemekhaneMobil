@@ -40,6 +40,7 @@ public class RetrofitManager {
     private OkHttpClient okHttpClient;
     private ConnectionService service;
     private ClearableCookieJar cookieJar;
+    private HostSelectionInterceptor hostInterceptor;
 
     public static RetrofitManager instance() {
         return mInstance;
@@ -49,14 +50,22 @@ public class RetrofitManager {
         return instance().getApi();
     }
 
-    public static void setBaseUrl(String url) {
+    public String getHost() {
+        return hostInterceptor.getHost();
+    }
+
+    public RetrofitManager setHost(String url) {
+        hostInterceptor.setHost(url);
+        return instance();
     }
 
     public void init(Context context) {
         cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
+        hostInterceptor = new HostSelectionInterceptor();
         okHttpClient = new OkHttpClient.Builder()
                 .cookieJar(cookieJar)
                 .addInterceptor(new HandlerResponseInterceptor())
+                .addInterceptor(hostInterceptor)
                 .build();
         retrofit = new Retrofit.Builder()
                 .baseUrl(UrlConstants.SKS1_BASE)

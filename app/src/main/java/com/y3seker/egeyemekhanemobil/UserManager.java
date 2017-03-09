@@ -25,6 +25,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.constants.PrefConstants;
 import com.y3seker.egeyemekhanemobil.localapi.LocalAPI;
 import com.y3seker.egeyemekhanemobil.models.User;
+import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +99,9 @@ public class UserManager {
             caller.onCompleted();
             return null;
         }
-
+        final String oldHost = RetrofitManager.instance().getHost();
+        RetrofitManager.instance()
+                .setHost(user.getBaseUrl());
         return LocalAPI.get().login(user, context, new Subscriber<User>() {
             @Override
             public void onCompleted() {
@@ -107,6 +110,7 @@ public class UserManager {
 
             @Override
             public void onError(Throwable e) {
+                RetrofitManager.instance().setHost(oldHost);
                 user.setIsLoggedIn(false);
                 caller.onError(e);
             }
@@ -177,6 +181,7 @@ public class UserManager {
 
     public UserManager setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
+        RetrofitManager.instance().setHost(this.currentUser.getBaseUrl());
         return mInstance;
     }
 
