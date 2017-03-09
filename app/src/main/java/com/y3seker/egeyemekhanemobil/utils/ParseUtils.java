@@ -78,4 +78,11 @@ public final class ParseUtils {
         return Jsoup.parse(rawHTML).getElementById(ParseConstants.USERS_NAME).text();
     }
 
+    public static boolean isHomePage(Document document) {
+        try {
+            return document.getElementById("aspnetForm").attr("action").equals("./anasayfa.aspx");
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

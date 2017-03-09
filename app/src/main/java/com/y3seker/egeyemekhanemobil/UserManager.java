@@ -99,7 +99,9 @@ public class UserManager {
             caller.onCompleted();
             return null;
         }
-        final String oldHost = RetrofitManager.instance().getHost();
+        final User oldKing = getCurrentUser();
+        // Changing users to handle cookies
+        setCurrentUser(user);
         RetrofitManager.instance()
                 .setHost(user.getBaseUrl());
         return LocalAPI.get().login(user, context, new Subscriber<User>() {
@@ -110,7 +112,8 @@ public class UserManager {
 
             @Override
             public void onError(Throwable e) {
-                RetrofitManager.instance().setHost(oldHost);
+                // If things went wrong, return to the true king
+                setCurrentUser(oldKing);
                 user.setIsLoggedIn(false);
                 caller.onError(e);
             }

@@ -20,6 +20,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.y3seker.egeyemekhanemobil.localapi.parsers.LoginParser;
 import com.y3seker.egeyemekhanemobil.models.User;
 import com.y3seker.egeyemekhanemobil.retrofit.RetrofitManager;
+import com.y3seker.egeyemekhanemobil.utils.ParseUtils;
 
 import org.jsoup.nodes.Document;
 
@@ -63,10 +64,14 @@ public class LocalAPI {
             return null;
         }
         return RetrofitManager.service().getLogin()
+                .retry()
                 .flatMap(new Func1<Document, Observable<?>>() {
 
                     @Override
                     public Observable<?> call(Document document) {
+                        // If cookies worked, don't try to login again
+                        if (ParseUtils.isHomePage(document))
+                            return Observable.just(document);
                         RequestBody requestBody = getLoginRequestBody(user);
                         return RetrofitManager.service().postLogin(requestBody);
                     }

@@ -60,7 +60,7 @@ public class RetrofitManager {
     }
 
     public void init(Context context) {
-        cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
+        cookieJar = new PersistentCookieJar(new UserCookieCache(), new SharedPrefsCookiePersistor(context));
         hostInterceptor = new HostSelectionInterceptor();
         okHttpClient = new OkHttpClient.Builder()
                 .cookieJar(cookieJar)
