@@ -26,29 +26,32 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.y3seker.egeyemekhanemobil.R;
+import com.y3seker.egeyemekhanemobil.activities.MyMenusActivity;
 import com.y3seker.egeyemekhanemobil.models.MyMenusItem;
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Yunus Emre Şeker on 24.10.2015.
  * -
  */
-public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
 
     private final int itemLayoutID;
     private final int grey;
     private final int accent;
     private List<MyMenusItem> items;
+    private List<MyMenusActivity.OnClickListener> listeners;
 
     public MenuRVAdapter(Context c, int itemLayoutID, List<MyMenusItem> items) {
         this.itemLayoutID = itemLayoutID;
         this.items = items;
         grey = ContextCompat.getColor(c, R.color.grey_400);
         accent = ContextCompat.getColor(c, R.color.colorAccent);
+        listeners = new ArrayList<>();
     }
-
 
     public void changeList(List<MyMenusItem> items) {
         this.items = items;
@@ -63,7 +66,19 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(itemLayoutID, parent, false);
-        return new MyMenusHolder(v);
+        MyMenusHolder myMenusHolder = new MyMenusHolder(v);
+        myMenusHolder.getAdapterPosition();
+        // don't even ask, will be replaced
+        myMenusHolder.breakfast.setOnClickListener(this);
+        myMenusHolder.breakfast.setTag(R.id.order_fab, "K");
+        myMenusHolder.breakfast.setTag(R.id.list, myMenusHolder);
+        myMenusHolder.lunch.setOnClickListener(this);
+        myMenusHolder.lunch.setTag(R.id.order_fab, "O");
+        myMenusHolder.lunch.setTag(R.id.list, myMenusHolder);
+        myMenusHolder.dinner.setOnClickListener(this);
+        myMenusHolder.dinner.setTag(R.id.list, myMenusHolder);
+        myMenusHolder.dinner.setTag(R.id.order_fab, "A");
+        return myMenusHolder;
     }
 
     @Override
@@ -92,6 +107,21 @@ public class MenuRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public void onClick(View v) {
+        String menuType = (String) v.getTag(R.id.order_fab);
+        MyMenusHolder holder = (MyMenusHolder) v.getTag(R.id.list);
+        int pos = holder.getAdapterPosition();
+        MyMenusItem item = items.get(pos);
+        for (MyMenusActivity.OnClickListener listener : listeners) {
+            listener.onClick(item, menuType);
+        }
+    }
+
+    public void addOnClickListener(MyMenusActivity.OnClickListener onClickListener) {
+        listeners.add(onClickListener);
     }
 
     public static class MyMenusHolder extends RecyclerView.ViewHolder {

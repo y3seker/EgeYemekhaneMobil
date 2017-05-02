@@ -148,6 +148,13 @@ public class BaseActivity extends RxAppCompatActivity {
         progressDialog.show();
     }
 
+    void makeDialog(String title, String message) {
+        new AlertDialog.Builder(this).setTitle(title)
+                .setMessage(message)
+                .create()
+                .show();
+    }
+
     public void showProgressDialog(int message) {
         showProgressDialog(getString(message));
     }
