@@ -18,6 +18,9 @@ package com.y3seker.egeyemekhanemobil.models;
 
 import com.y3seker.egeyemekhanemobil.utils.Utils;
 
+import java.text.ParseException;
+import java.util.Date;
+
 /**
  * Created by Yunus Emre Şeker on 24.10.2015.
  * -
@@ -26,13 +29,13 @@ public class OrderItem implements Comparable<OrderItem> {
     public final String text;
     public final String name;
     public final String dayNumber;
+    private final String date;
     public String menuUrl;
     public String menu;
     public boolean isDisabled;
     public boolean isChecked;
     public boolean isInProgress;
     public boolean isOrderedBefore;
-    private final String date;
 
     private OrderItem(String text, String name, String date, boolean isDisabled, boolean isOrderedBefore) {
         this.text = text;
@@ -64,6 +67,15 @@ public class OrderItem implements Comparable<OrderItem> {
 
     public void setIsOrderedBefore(boolean isOrderedBefore) {
         this.isOrderedBefore = isOrderedBefore;
+    }
+
+    public Date getDate() {
+        try {
+            return Utils.myMenusDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setMenu(String menu) {

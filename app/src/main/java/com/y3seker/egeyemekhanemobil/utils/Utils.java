@@ -54,7 +54,7 @@ public final class Utils {
     public static final Calendar today;
 
     private static final String TAG = Utils.class.getSimpleName();
-    private static final SimpleDateFormat myMenusDateFormat;
+    public static final SimpleDateFormat myMenusDateFormat;
     private static final SimpleDateFormat myMenusReverseDateFormat;
     private static final TimeZone trTimeZone;
     private static final Locale trLocale;

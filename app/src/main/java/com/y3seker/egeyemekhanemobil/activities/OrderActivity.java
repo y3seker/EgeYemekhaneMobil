@@ -52,6 +52,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,15 +82,6 @@ import static com.y3seker.egeyemekhanemobil.constants.ParseConstants.YETERSIZ_BA
 public class OrderActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = OrderActivity.class.getSimpleName();
-
-    private List<OrderItem> orderItems;
-    private List<String> spinnerValues;
-    private List<String> spinnerLabels;
-    private ArrayAdapter<String> aa;
-    private OrderGridAdapter rvAdapter;
-    private boolean inProgress = false;
-    private CoordinatorLayout.LayoutParams fabLP;
-
     @Bind(R.id.root_layout)
     CoordinatorLayout coLayout;
     @Bind(R.id.order_appbar)
@@ -110,7 +102,13 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
     View cardDivider;
     @Bind(R.id.order_rv)
     RecyclerView recyclerView;
-
+    private List<OrderItem> orderItems;
+    private List<String> spinnerValues;
+    private List<String> spinnerLabels;
+    private ArrayAdapter<String> aa;
+    private OrderGridAdapter rvAdapter;
+    private boolean inProgress = false;
+    private CoordinatorLayout.LayoutParams fabLP;
     private CompositeSubscription postSubs;
     private Subscription firstPageSub;
     private List<Subscription> subs;
@@ -289,10 +287,23 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
             }
         }
         Collections.sort(orderItems);
+        fillUpDates();
         hideProgressBar();
         rvAdapter.notifyItemRangeChanged();
         harcananText.setText(doc.getElementById(HARCANAN_BAKIYE).text().replace("TL", " TL"));
         kalanText.setText(doc.getElementById(KALAN_BAKIYE).text().replace("TL", " TL"));
+    }
+
+    // FIXME also get ride of this, replace it with proper calendar view
+    private void fillUpDates() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(orderItems.get(0).getDate());
+        int fillCount = cal.get(Calendar.DAY_OF_WEEK) - 2;
+        int dayInMonth = cal.get(Calendar.DAY_OF_MONTH);
+        for (int i = dayInMonth - 1; i >= dayInMonth - fillCount; i--) {
+            orderItems.add(0, new OrderItem("" + i, "",
+                    "", true, false, ""));
+        }
     }
 
     private void postItem(String name, final int pos) {
@@ -502,13 +513,6 @@ public class OrderActivity extends BaseActivity implements AdapterView.OnItemSel
         snackbar = Snackbar.make(coLayout, message, duration)
                 .setAction(actionTitle, actionListener);
         snackbar.show();
-    }
-
-    private void makeDialog(String title, String message) {
-        new AlertDialog.Builder(this).setTitle(title)
-                .setMessage(message)
-                .create()
-                .show();
     }
 
     private void onFailed(int message, int duration, View.OnClickListener actionListener) {
