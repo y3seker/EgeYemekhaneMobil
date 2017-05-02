@@ -24,8 +24,8 @@ android {
         applicationId "com.y3seker.egeyemekhanemobil"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 14
-        versionName "2.0.2"
+        versionCode 15
+        versionName "2.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         /*
         * Enables Jack, disables Instant Run :(
